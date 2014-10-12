@@ -36,20 +36,19 @@ goto done
 ::Main
 :main
 color 0f
-if "%new13%"=="y" (color 0e)
 cls
 set command=
 set debug=
 title %t% - %n%
-if "%new13%"=="y" (title %t% - New13 Deceted)
         echo Our website:www.GhostBirdOS.org
 	echo ==============================================================
 	echo.
-	echo + Enter - Make and Launch (Quick Mode)
-	echo +     1 - Make and Launch (Debug Mode)
+	echo + Enter - Make and Launch (Debug Mode)
+	echo +     1 - Make and Launch (Fast Mode)
 	echo.
 	echo +     2 - Run Virtual Machine
 	echo +     3 - Delete Temporary Files
+	echo +     4 - Publish this build
 	ECHO.
 	echo +     5 - About ^& Help
 	echo +     6 - Update Log
@@ -64,6 +63,7 @@ if "%command%"=="" goto all
 if "%command%"=="1" goto debug
 if "%command%"=="2" goto run
 if "%command%"=="3" goto deltmp
+if "%command%"=="4" goto publish
 if "%command%"=="5" goto about
 if "%command%"=="6" goto log
 if "%command%"=="7" (start make.bat&exit)
@@ -73,11 +73,29 @@ echo ** Unknown Command. Press Any Key to Return.
 pause > nul
 goto main
 :all
-goto compile
-:debug
+
 set debug=y
 goto compile
-
+:debug
+goto compile
+:publish
+color 0c
+cls
+echo Are you sure to PUBLISH?(Press any key for 3 times)
+pause>nul
+cls
+echo Are you sure to PUBLISH?(Press any key for 2 times)
+pause>nul
+cls
+echo Are you sure to PUBLISH?(Press any key to continue)
+color f
+del /s /f /q KERNEL>nul 2>nul
+del /s /f /q *.o>nul 2>nul
+del /s /f /q *.bin>nul 2>nul
+	echo ** Temporary files have been deleted!
+cd ..\..\..\
+svnshell.cmd coci
+exit
 :Compile
 cls
 title %t% - Compiling...
