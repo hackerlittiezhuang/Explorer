@@ -52,7 +52,7 @@ title %t% - %n%
 	ECHO.
 	echo +     5 - About ^& Help
 	echo +     6 - Update Log
-	echo +     7 - Back to Traditional Make
+	echo +     7 - Go to Lab Explorer Make System
 	echo.
 	echo +     0 - Exit
 	echo.
