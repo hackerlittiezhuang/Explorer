@@ -13,7 +13,7 @@ cls
 	echo Here is error information:
 	type tmp\error.log
 pause>nul
-start public~1.cmd
+"public make.cmd"
 exit
 :quick
 title %t% - %2(Quick Mode)

@@ -21,6 +21,8 @@
 /*main function of kernel*/
 void main(void)
 {
+    unsigned char testnormal[] = "Exp";
+	unsigned char detest[] = "lorer";
 	/*显示版权、设备等信息*/
 	/**
 	 * display copyright and device etc information
@@ -28,6 +30,8 @@ void main(void)
 	put_info();
 	/*测试C++函数*/
 	test_C_plus_plus();
+		color(0xffff00);
+	printk("this is a test.F%dck.%s",detest,testnormal);
 	//init_hdd();
 	//init_FAT32();
 	/*加载文件*/
