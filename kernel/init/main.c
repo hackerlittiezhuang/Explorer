@@ -47,11 +47,13 @@ void main(void)
 void put_info(void)
 {
 	color(0xffff00);
-	printk("%s %s\n", kernel_name, kernel_version);
-	printk("made by %s\n", author);
+	printk("%s %s Author:[%s]\n", kernel_name, kernel_version, author);
+	color(0xffffff);
 	printk("%s\n", copyright);
-	printk("It is base on %s.\n", base);
-	printk("%s\n", description);
+	color(0xffff00);
+	printk("Base: %s.\n", base);
+	color(0xffffff);
+	printk("%s\n\n", description);
 	color(0xffffff);
 }
 
