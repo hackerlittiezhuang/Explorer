@@ -24,9 +24,7 @@ int printk(const char *fmt, ...);
 void debug(u32 *address, u32 size);
 void color(u32 color);
 void put_font(u8 ascii);
-void deput_font(u8 ascii);
 void draw_font(u32 x, u32 y, u32 color, u8 ascii);
-void dedraw_font(u32 x, u32 y, u32 color, u8 ascii);
 void draw_square(u32 x, u32 y, u32 width, u32 height, u32 color);
 
 #endif

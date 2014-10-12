@@ -162,33 +162,7 @@ void put_font(u8 ascii)
 	/*模拟光标指向下一个单位*/
 	shell.cursor ++;
 }
-void deput_font(u8 ascii)
-{
-	/*换行键的判断*/
-	if (ascii == 0x0a)
-	{
-		shell.cursor -= (shell.cursor % shell.width);
-		shell.cursor += shell.width;
-		return;
-	}
-	/*对控制字符的判断*/
-	if (ascii < 0x20)
-	{
-		return;
-	}
-	/*对是否需要滚屏判断*/
-	if (shell.cursor >= shell.size) {
-		scr_up();
-	}
-	/*由模拟文本模式参数到实际图形模式的转换*/
-	u32 x, y;
-	x = shell.x + (shell.cursor % shell.width) * 8;
-	y = shell.y + (shell.cursor / shell.width) * 16;
-	/*调用显示函数*/
-	dedraw_font(x, y, shell.color, ascii);
-	/*模拟光标指向下一个单位*/
-	shell.cursor ++;
-}
+
 put_string(u32 x, u32 y, u32 color, u8 *string)
 {
 	u32 point;
@@ -218,24 +192,7 @@ void draw_font(u32 x, u32 y, u32 color, u8 ascii)
 		if ((d & 0x01) != 0) { put_pix_24(x + 7, y + i, color); }
 	}
 }
-void dedraw_font(u32 x, u32 y, u32 color, u8 ascii)
-{
-	u32 p, i, font_offset;/*字库偏移量*/
-	u8 d;
-	font_offset = ascii * 16;
-	for (i = 0; i < 16; i++)
-	{
-		d = font[font_offset + i];
-		if ((d & 0x80) != 0) { deput_pix_24(x, y + i, color); }
-		if ((d & 0x40) != 0) { deput_pix_24(x + 1, y + i, color); }
-		if ((d & 0x20) != 0) { deput_pix_24(x + 2, y + i, color); }
-		if ((d & 0x10) != 0) { deput_pix_24(x + 3, y + i, color); }
-		if ((d & 0x08) != 0) { deput_pix_24(x + 4, y + i, color); }
-		if ((d & 0x04) != 0) { deput_pix_24(x + 5, y + i, color); }
-		if ((d & 0x02) != 0) { deput_pix_24(x + 6, y + i, color); }
-		if ((d & 0x01) != 0) { deput_pix_24(x + 7, y + i, color); }
-	}
-}
+
 void draw_square(u32 x, u32 y, u32 width, u32 height, u32 color)
 {
 	u32 m, n;
