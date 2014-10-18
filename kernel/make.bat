@@ -1,85 +1,109 @@
-::  Lab Explorer make system
-::  Powered by Smilodon
-::    WRITTEN BY ROSE<roselyu@163.com>Hu wenjie(CN)<1@GhostBirdOS.org>
 @echo off
+::::::::::::::::::::::::::::::::::::::
+::  构建程式 - Smilodon 助力
+::  简体中文版
+::  适配于 Explorer v14
+::
+::    ROSE编写 Rose<roselyu@163.com>
+::::::::::::::::::::::::::::::::::::::
+chcp 936
+::切换到简体中文编码页
+
 if not exist tmp (md tmp)
 if not exist private (md private)
-set t=Lab Explorer
-if exist new13 (set new13=y)
+set t=构建程式 0.2 中文版
+set n=v14系列适配
 goto main
 :done
-color 0f
-title %t%
+<<<<<<< HEAD:kernel/Make.cmd
+title %t% - 完成
+=======
+title %t% - Done
+>>>>>>> explorer/master:kernel/Public Make.cmd
 	echo.
 	echo.
 	echo.
-	echo ^[请按任意键返回^]
+	echo ^[按任意键返回^]
 pause > nul
 goto main
 
 :error
 cls
-title %t% 链接失败
+title %t% - 编译错误
 	color 0c
 cls
-	echo 抱歉，编译失败。
-	echo 源代码有一些错误。
+	echo ** 抱歉 编译错误
+	echo ** 源代码中可能出现一些错误
 	echo.
+	echo 错误详情:
 	type tmp\error.log
 goto done
+
 
 ::Main
 :main
 color 0f
-if "%new13%"=="y" (color 0e)
+mode con cols=38 lines=30
 cls
 set command=
 set debug=
-title %t% 编译系统
-if "%new13%"=="y" (title %t% - New13 Deceted)
-	echo 版权所有 2013-2014 鬼鸟操作系统开发者。
-	echo Copyright 2013-2014 by Ghost Bird OS Developer.
-	echo 我们的网站:www.GhostBirdOS.org
-	echo 功能号	备注
+title %t% - %n%
+    	echo 我们的网站 www.GhostBirdOS.org
+	echo --------------------------------------
 	echo.
-	echo Enter	编译、装载并运行（快速模式）
-	echo 1	仅运行
-	echo 2	启动Virtual Box虚拟机
-	echo 3	删除临时文件
-	echo 4	检查并提交
-	echo 5	仅检查
-	echo 6	强制提交（危险）
-	echo 7	安装向导
-	echo 8	更新日志
-	echo 9	关于Lab Explorer make system
-	echo 0	Exit
+	echo +    Enter - 构建并启动虚拟机(调试)
+	echo +        1 - 构建并启动虚拟机(快速)
 	echo.
-set /p command="请选择功能号："
+	echo +        2 - 启动虚拟机
+	echo +        3 - 删除临时文件
+	echo +        4 - 发布
+	ECHO.
+	echo +        5 - 关于和帮助
+	echo +        6 - 查看升级日志
+	echo.
+	echo +        0 - 退出
+	echo.
+	echo --------------------------------------
+	echo [   按下 ENTER 执行构建并启动虚拟机  ]
+	echo.
+set /p command="功能:"
 if "%command%"=="" goto all
 if "%command%"=="1" goto debug
 if "%command%"=="2" goto run
 if "%command%"=="3" goto deltmp
-if "%command%"=="4" goto Checkout_Commit
-if "%command%"=="5" goto co
-if "%command%"=="6" goto ci
-if "%command%"=="7" goto setup
-if "%command%"=="8" goto log
-if "%command%"=="9" goto about
+if "%command%"=="4" goto publish
+if "%command%"=="5" goto about
+if "%command%"=="6" goto log
 if "%command%"=="0" exit
-cls
-echo 未知命令，按任意键返回。
+echo ** 未知命令 任意键返回
 pause > nul
 goto main
 :all
-goto compile
-:debug
 set debug=y
 goto compile
-
+:debug
+goto compile
+:publish
+color 0c
+cls
+<<<<<<< HEAD:kernel/Make.cmd
+echo 你确定要发布吗？(任意键继续)
+=======
+echo Are you sure to PUBLISH?(Press any key to continue)
+>>>>>>> explorer/master:kernel/Public Make.cmd
+color f
+del /s /f /q KERNEL>nul 2>nul
+del /s /f /q *.o>nul 2>nul
+del /s /f /q *.bin>nul 2>nul
+	echo ** 临时文件清理完毕
+cd ..\..\..\
+svnshell.cmd coci
+exit
 :Compile
 cls
-title %t% - 编译中...
-echo 错误信息：>tmp\error.log
+mode con cols=80 lines=25
+title %t% - 正在编译...
+echo -------------------------------------->tmp\error.log
 del /s /f /q KERNEL>nul 2>nul
 del /s /f /q *.o>nul 2>nul
 del /s /f /q *.bin>nul 2>nul
@@ -93,12 +117,12 @@ del /s /f /q *.bin>nul 2>nul
 	nasm -f elf drivers\dev_intr.asm -o tmp\dev_intr.o
 	nasm -f elf syscalls\do_syscalls.asm -o tmp\do_syscalls.o
 	call pcc.cmd -c arch\x86\kernel\kernel_start.c -o tmp\kernel_start.o -I "%cd%\include"
+	call pcc.cmd -c arch\x86\kernel\task.c -o tmp\task.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\i8254.c -o tmp\i8254.o -I "%cd%\include"
 	call pcc.cmd -c init\main.c -o tmp\main.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\shell.c -o tmp\shell.o -I "%cd%\include"
 	call pcc.cmd -c lib\fonts\font.c -o tmp\font.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\memory.c -o tmp\memory.o -I "%cd%\include"
-	call pcc.cmd -c arch\x86\kernel\task.c -o tmp\task.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\kmalloc.c -o tmp\kmalloc.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\do_page_fault.c -o tmp\do_page_fault.o -I "%cd%\include"
 	call pcc.cmd -c drivers\hdd.c -o tmp\hdd.o -I "%cd%\include"
@@ -115,9 +139,9 @@ del /s /f /q *.bin>nul 2>nul
 	call pcc.cmd -c lib\string.c -o tmp\string.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\shell.c -o tmp\shell.o -I "%cd%\include"
 	call p++.cmd -c C++\test.cpp -o tmp\test.o -I "%cd%\include"
-echo 拷贝私有模块...
+echo ** 编译私有模块...
 	copy /y private\* tmp\*.o >nul 2>nul
-echo 链接中...
+echo ** 链接目标文件...
 	::Link
 	ld -o tmp\kernel.o	-Ttext 0x11000^
 	tmp\_start.o tmp\kernel_start.o tmp\main.o^
@@ -130,7 +154,7 @@ echo 链接中...
 	tmp\syscalls.o tmp\do_syscalls.o^
 	tmp\test.o tmp\string.o tmp\GUI.o tmp\window.o tmp\init.o 2>>tmp\error.log
 	echo.>>tmp\error.log
-	echo 由objcopy导致的错误：>>tmp\error.log
+	echo objcopy's error:>>tmp\error.log
 	objcopy -R .note -R .comment -S -O binary tmp\kernel.o tmp\kernel.bin 2>>tmp\error.log
 
 	::Binary Copy
@@ -138,18 +162,18 @@ echo 链接中...
 	findstr No "tmp\error.log">nul&&goto Error||echo ** Compiled!
 	del /f /s /q tmp\error.log >nul 2>nul
 cls
-	echo 内核已经编译完成。
-title %t% 装载内核中.
+	echo ** 编译成功完成！
+title %t% - 正在写入内核
 ::Write kernel to Explorer.img
-	echo 使用WinImage向Explorer.img装载KERNEL中.
+	echo ** 正在写入内核...
 	taskkill /f /im virtualbox.exe >nul 2>nul
 	WinImage ..\image\Explorer.img KERNEL /i /h /y
 
 
 :run
 ::Start Virtual Machine
-title %t% - 启动Virtual Box虚拟机
-	echo 启动Virtual Box虚拟机.
+title %t% - 启动虚拟机...
+	echo ** 正在启动虚拟机...
 	taskkill /f /im virtualbox.exe>nul 2>nul
 	VBoxManage.exe startvm "Ghost Bird 0.02"
 	goto done
@@ -157,80 +181,26 @@ title %t% - 启动Virtual Box虚拟机
 :about
 
 cls
-	echo %t%编译系统
-	echo 想获得更多信息，请访问www.GhostBirdOS.org
+	echo %t% - %n%
+	echo 我们的网站 www.GhostBirdOS.org
+	echo --------------------------------------
 	echo.
         if exist about (type about) else (echo Document not found.)
 goto done
 :log
 
 cls
-	echo 正在打开%t%的更新日志
-	echo 想获得更多信息，请访问www.GhostBirdOS.org
+	echo %t% - %n%
+	echo 我们的网站www.GhostBirdOS.org
+	echo --------------------------------------
 	echo.
 	if exist "updates.txt" (notepad "updates.txt"&goto done)
-	if exist "Smilodon Log.txt" (notepad "Smilodon Log.txt") else (echo Document not found.)
 goto done
 :deltmp
+cls
 del /s /f /q KERNEL>nul 2>nul
 del /s /f /q *.o>nul 2>nul
 del /s /f /q *.bin>nul 2>nul
-	echo 临时文件已经被删除。
-	goto done
-
-:svn
-if not exist init.cmd (echo 未安装！&goto setup)
-call init.cmd
-svn>nul 2>nul
-if "%errorlevel%"=="9009" (echo Subversion 还没有被安装。&pause>nul&exit)
-if "%1"=="coci" (cls&goto Checkout_Commit)
-echo 安装完成，请重新执行之前的命令。
+	echo ** 临时文件清理完毕
 goto done
-:setup
-color b
-title %t% 安装向导
-echo 欢迎使用Svn Shell！
-echo Svn Shell被Rose创造出来，被使用在GhostBird OS。
-echo.
-echo 如果你准备好了，就开始吧！
-echo.
-set /p usn="你的名字："
-echo @echo off>init.cmd
-echo set usn=%usn%>>init.cmd
-cls
-goto svn
-:::::::Main
-
-:co
-if not exist init.cmd (goto svn)
-title %t% 仅检查
-echo 检查开始
-svn co https://github.com/roselyu/Explorer
-echo 检查完成
-goto done
-
-:ci
-if not exist init.cmd (goto svn)
-title %t% 强制提交
-color 4
-echo 危险！
-echo [按任意键继续]
-pause>nul
-set /p msg="输入这个版本的描述："
-echo 开始提交.
-svn ci -m "%msg%" explorer --username %usn%
-echo 完成！
-goto done
-
-:Checkout_Commit
-if not exist init.cmd (goto svn)
-title %t% 检查并提交
-set /p msg="输入这个版本的描述："
-echo 检查中.
-svn co https://github.com/roselyu/Explorer
-echo 检查中.
-svn ci -m "%msg%" explorer --username %usn%
-echo 完成！
-goto done
-
 :eof
