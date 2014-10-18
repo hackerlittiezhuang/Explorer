@@ -15,11 +15,8 @@ set t=构建程式 0.2 中文版
 set n=v14系列适配
 goto main
 :done
-<<<<<<< HEAD:kernel/Make.cmd
 title %t% - 完成
-=======
-title %t% - Done
->>>>>>> explorer/master:kernel/Public Make.cmd
+
 	echo.
 	echo.
 	echo.
@@ -29,11 +26,10 @@ goto main
 
 :error
 cls
-title %t% - 编译错误
+title %t% - 链接或编译错误
 	color 0c
 cls
-	echo ** 抱歉 编译错误
-	echo ** 源代码中可能出现一些错误
+	echo ** 抱歉 链接或编译错误
 	echo.
 	echo 错误详情:
 	type tmp\error.log
@@ -86,17 +82,16 @@ goto compile
 :publish
 color 0c
 cls
-<<<<<<< HEAD:kernel/Make.cmd
+
 echo 你确定要发布吗？(任意键继续)
-=======
-echo Are you sure to PUBLISH?(Press any key to continue)
->>>>>>> explorer/master:kernel/Public Make.cmd
+
 color f
 del /s /f /q KERNEL>nul 2>nul
 del /s /f /q *.o>nul 2>nul
 del /s /f /q *.bin>nul 2>nul
-	echo ** 临时文件清理完毕
+	echo √ 临时文件清理完毕
 cd ..\..\..\
+cls
 svnshell.cmd coci
 exit
 :Compile
@@ -104,9 +99,7 @@ cls
 mode con cols=80 lines=25
 title %t% - 正在编译...
 echo -------------------------------------->tmp\error.log
-del /s /f /q KERNEL>nul 2>nul
-del /s /f /q *.o>nul 2>nul
-del /s /f /q *.bin>nul 2>nul
+
 	nasm loader\loader.asm -o tmp\loader.bin
 	nasm -f elf arch\x86\kernel\_start.asm -o tmp\_start.o
 	nasm -f elf arch\x86\io.asm -o tmp\io.o
@@ -123,6 +116,7 @@ del /s /f /q *.bin>nul 2>nul
 	call pcc.cmd -c arch\x86\kernel\shell.c -o tmp\shell.o -I "%cd%\include"
 	call pcc.cmd -c lib\font.c -o tmp\font.o -I "%cd%\include"
 	call pcc.cmd -c lib\fonts\standard_font.c -o tmp\standard_font.o -I "%cd%\include"
+	call pcc.cmd -c lib\fonts\simsun.c -o tmp\simsun.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\memory.c -o tmp\memory.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\kmalloc.c -o tmp\kmalloc.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\do_page_fault.c -o tmp\do_page_fault.o -I "%cd%\include"
@@ -140,13 +134,13 @@ del /s /f /q *.bin>nul 2>nul
 	call pcc.cmd -c lib\string.c -o tmp\string.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\shell.c -o tmp\shell.o -I "%cd%\include"
 	call p++.cmd -c C++\test.cpp -o tmp\test.o -I "%cd%\include"
-echo ** 编译私有模块...
 	copy /y private\* tmp\*.o >nul 2>nul
-echo ** 链接目标文件...
+cls
+echo -^> 链接目标文件...
 	::Link
 	ld -o tmp\kernel.o	-Ttext 0x11000^
 	tmp\_start.o tmp\kernel_start.o tmp\main.o^
-	tmp\shell.o tmp\font.o tmp\standard_font.o^
+	tmp\shell.o tmp\font.o tmp\standard_font.o tmp\simsun.o^
 	tmp\hdd.o tmp\video.o tmp\mouse.o tmp\keyboard.o tmp\i8254.o tmp\i8254_asm.o tmp\dev_intr.o^
 	tmp\i8259.o^
 	tmp\task.o^
@@ -157,26 +151,37 @@ echo ** 链接目标文件...
 	echo.>>tmp\error.log
 	echo objcopy's error:>>tmp\error.log
 	objcopy -R .note -R .comment -S -O binary tmp\kernel.o tmp\kernel.bin 2>>tmp\error.log
-
+cls
+echo -^> 合并可执行文件...
 	::Binary Copy
 	copy /B tmp\loader.bin + tmp\kernel.bin KERNEL >nul 2>nul
-	findstr No "tmp\error.log">nul&&goto Error||echo ** Compiled!
+	findstr No "tmp\error.log">nul&&goto Error
 	del /f /s /q tmp\error.log >nul 2>nul
 cls
-	echo ** 编译成功完成！
 title %t% - 正在写入内核
 ::Write kernel to Explorer.img
-	echo ** 正在写入内核...
+	echo √ 编译代码
+	echo -^> 写入内核
+	echo ** 启动虚拟机...
 	taskkill /f /im virtualbox.exe >nul 2>nul
 	WinImage ..\image\Explorer.img KERNEL /i /h /y
 
 
 :run
+cls
 ::Start Virtual Machine
 title %t% - 启动虚拟机...
-	echo ** 正在启动虚拟机...
+	echo √ 编译代码
+	echo √ 写入内核
+	echo -^> 启动虚拟机
+	ping 127.1 /n 1 >nul 2>nul
 	taskkill /f /im virtualbox.exe>nul 2>nul
-	VBoxManage.exe startvm "Ghost Bird 0.02"
+	VBoxManage.exe startvm "Ghost Bird 0.02" >nul
+	if %errorlevel%==0 (goto main) else (echo ** 虚拟机未启动)
+cls
+	echo √ 编译代码
+	echo √ 写入内核
+	echo √ 启动虚拟机
 	goto done
 
 :about
@@ -202,6 +207,6 @@ cls
 del /s /f /q KERNEL>nul 2>nul
 del /s /f /q *.o>nul 2>nul
 del /s /f /q *.bin>nul 2>nul
-	echo ** 临时文件清理完毕
+	echo √ 临时文件清理完毕
 goto done
 :eof

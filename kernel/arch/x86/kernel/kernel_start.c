@@ -21,6 +21,7 @@ void kernel_start(void)
 	init_trap();
 	init_task();
 	init_dev();
+	//Display Initialization
 	init_font();
 	init_graph();
 	init_shell();

@@ -11,11 +11,15 @@
 // *font_name : name of the font
 // *font_addr : address of the font
 //
-
+#define FONTDATAMAX 4096
 struct fontstr{
 unsigned char *font_name;
 unsigned char *font_addr;
 };
 
 void init_font(void);
-long regfont(char *name,char *addr);
+long regfont(unsigned char *name,unsigned char *addr);
+unsigned char *get_font_addr(unsigned char *name);
+//Other Fonts here.
+unsigned char standard_font[FONTDATAMAX];
+unsigned char simsun[FONTDATAMAX];
