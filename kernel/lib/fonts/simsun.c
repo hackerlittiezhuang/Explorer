@@ -9,7 +9,7 @@
 
 #include <font.h> 
 
-static unsigned char simsun[FONTDATAMAX] = {
+unsigned char simsun[FONTDATAMAX] = {
 	/* 0 0x00 '^@' */
 	0b11111111,	0b10000001,	0b10000001,	0b10000001,	0b10000001,	0b10000001,	0b10000001,	0b10000001,	0b10000001,	0b10000001,	0b10000001,	0b10000001,	0b10000001,	0b10000001,	0b10000001,	0b11111111,
 	/* 1 0x01 '^A' */

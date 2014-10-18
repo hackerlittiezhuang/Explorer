@@ -10,7 +10,7 @@
 
 #include <font.h>
 
-static unsigned char standard_font[FONTDATAMAX] = {
+unsigned char standard_font[FONTDATAMAX] = {
 
 	/* 0 0x00 '^@' */
 	0x00, /* 00000000 */
