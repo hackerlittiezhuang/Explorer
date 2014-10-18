@@ -121,7 +121,8 @@ del /s /f /q *.bin>nul 2>nul
 	call pcc.cmd -c arch\x86\kernel\i8254.c -o tmp\i8254.o -I "%cd%\include"
 	call pcc.cmd -c init\main.c -o tmp\main.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\shell.c -o tmp\shell.o -I "%cd%\include"
-	call pcc.cmd -c lib\fonts\font.c -o tmp\font.o -I "%cd%\include"
+	call pcc.cmd -c lib\font.c -o tmp\font.o -I "%cd%\include"
+	call pcc.cmd -c lib\fonts\standard_font.c -o tmp\standard_font.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\memory.c -o tmp\memory.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\kmalloc.c -o tmp\kmalloc.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\do_page_fault.c -o tmp\do_page_fault.o -I "%cd%\include"
@@ -145,7 +146,7 @@ echo ** 链接目标文件...
 	::Link
 	ld -o tmp\kernel.o	-Ttext 0x11000^
 	tmp\_start.o tmp\kernel_start.o tmp\main.o^
-	tmp\shell.o tmp\font.o^
+	tmp\shell.o tmp\font.o tmp\standard_font.o^
 	tmp\hdd.o tmp\video.o tmp\mouse.o tmp\keyboard.o tmp\i8254.o tmp\i8254_asm.o tmp\dev_intr.o^
 	tmp\i8259.o^
 	tmp\task.o^

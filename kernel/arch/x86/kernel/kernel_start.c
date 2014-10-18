@@ -9,6 +9,7 @@
 
 #include <lib/string.h>
 #include <stdbool.h>
+#include <font.h>
 #include "../include/kernel_start.h"
 /**This file including some of CPU family or model string*/
 #include "../include/CPU.h"
@@ -20,6 +21,7 @@ void kernel_start(void)
 	init_trap();
 	init_task();
 	init_dev();
+	init_font();
 	init_graph();
 	init_shell();
 	fin:goto fin;

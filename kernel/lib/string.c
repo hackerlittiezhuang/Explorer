@@ -2,7 +2,7 @@
  *Copyright 2013-2014 by Explorer Developer.
  *made by Hu wenjie(CN)<1@GhostBirdOS.org>,Linus Torvalds
  *Explorer C standard string
- *ExplorerOS/Kernel/lib/string.h
+ *ExplorerOS/Kernel/lib/string.c
  *version:Alpha
  *7/20/2014
  */
