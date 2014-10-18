@@ -114,7 +114,7 @@ echo -------------------------------------->tmp\error.log
 	call pcc.cmd -c arch\x86\kernel\i8254.c -o tmp\i8254.o -I "%cd%\include"
 	call pcc.cmd -c init\main.c -o tmp\main.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\shell.c -o tmp\shell.o -I "%cd%\include"
-	call pcc.cmd -c lib\font.c -o tmp\font.o -I "%cd%\include"
+	call pcc.cmd -c lib\fonts\font.c -o tmp\font.o -I "%cd%\include"
 	call pcc.cmd -c lib\fonts\standard_font.c -o tmp\standard_font.o -I "%cd%\include"
 	call pcc.cmd -c lib\fonts\simsun.c -o tmp\simsun.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\memory.c -o tmp\memory.o -I "%cd%\include"
