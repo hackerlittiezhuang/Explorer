@@ -6,8 +6,10 @@
  *2014.7.18 5:48 PM
  */
  
-#include "../include/hdd.h"
-#include "../include/types.h"
+#include <hdd.h>
+#include <types.h>
+#include <stdlib.h>
+#include <kmalloc.h>
 
 
 unsigned int LBA_start;
@@ -18,10 +20,15 @@ void init_hdd(void)
 	/*set interrupt*/
 	register_PIC(0xe, &int_HDC, "Hard Disk Control");
 	u8 *point;
-	point = (char *) kmalloc(512);
+	point = (u8 *) oldkmalloc(512);
+	/*if (point == NULL)
+	{
+		printk("HDD:memory allocate error!");
+		io_hlt();
+	}*/
 	read_disk(0, (unsigned short int*) point, 1);
 	kmemcpy((point + 0x1be + 8), &LBA_start, 2);
-	kfree(point, 512);
+	oldkfree(point, 512);
 }
 
 void read_disk(u32 LBA, u16 *buffer, u32 number)

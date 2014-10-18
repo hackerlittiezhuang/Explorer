@@ -24,7 +24,7 @@ void init_mouse(void)
 	extern	int_mouse;
 	/*зЂВс8259*/
 
-	register_PIC(0xc, &int_mouse, "Mouse");
+	register_PIC(12, &int_mouse, "Mouse");
   	//enable_mouse();
 }
 

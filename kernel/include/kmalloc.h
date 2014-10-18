@@ -13,8 +13,8 @@
 #include <stddef.h>
 
 /*多个内存池的内存分配限度*/
-#define		NUMBER_OF_128KB 32
-#define		NUMBER_OF_64KB 32
+#define		NUMBER_OF_128KB 8
+#define		NUMBER_OF_64KB 64
 #define		NUMBER_OF_32KB 16
 #define		NUMBER_OF_16KB 16
 #define		NUMBER_OF_8KB 16

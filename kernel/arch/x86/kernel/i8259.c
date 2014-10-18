@@ -40,12 +40,12 @@ void init_PIC(void)
 	io_out8(PIC1_ICW3, 2);/*从8259跟PIC 2 相连*/
 	io_out8(PIC1_ICW4, 0x01);/*无缓冲模式*/
 
-	io_out8(PIC0_IMR, 0xff);/*禁止所有中断*/
+	io_out8(PIC0_IMR, 0xfb);/*禁止所有中断*/
 	io_out8(PIC1_IMR, 0xff);/*禁止所有中断*/
 	
 	/*set interrupt*/
 	extern int_Slave_8259A;
-	register_PIC(2, &int_Slave_8259A, "salve 8259A");
+	//register_PIC(2, &int_Slave_8259A, "salve 8259A");
 	io_sti();/*开启可屏蔽中断*/
 }
 

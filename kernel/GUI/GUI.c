@@ -77,7 +77,7 @@ long int GUI_set_resolution(struct struct_layer *layer, unsigned long length, un
 	/*If it had buffer,we must free first*/
 	if ((*layer).buf != NULL)
 	{
-		kfree((*layer).buf, (*layer).width * (*layer).length * 4);
+		oldkfree((*layer).buf, (*layer).width * (*layer).length * 4);
 	}
 	(*layer).buf = (unsigned int *) kmalloc(length * width * 4);
 	(*layer).length = length;

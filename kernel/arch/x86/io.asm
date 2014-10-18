@@ -1,20 +1,20 @@
 ;Copyright 2013-2014 by 2013-2014 by Explorer OS Developer. All rights reserved.
-;made by ÃÔ²ÊºìĞÇ<1@GhostBirdOS.org>
-;Explorer 0.01 x86Æ½Ì¨Ó²¼ş³éÏó²ãÊäÈëÊä³öº¯Êı¿â
+;made by Rose<roselyu@163.com> Hu wenjie(CN)<1@GhostBirdOS.org>
+;Explorer 0.01 x86 I/O instruction support
 ;Explorer 0.01/arch/x86/io.asm
 ;7/14/2014 1:03 PM
 
-;ÊäÈëÊä³öº¯Êı
-global	io_hlt,io_cli,io_sti
-global	io_read_eflags,io_write_eflags
-global	io_in8,io_in16,io_in32
-global	io_out8,io_out16,io_out32
+;è¾“å…¥è¾“å‡ºå‡½æ•°
+global	io_hlt,io_cli,io_sti			;(åœ¨æ–°çš„ç¡¬ä¸­æ–­å‘ç”Ÿä¹‹å‰)åœæœºã€å…³ä¸­æ–­ã€å¼€ä¸­æ–­
+global	io_read_eflags,io_write_eflags	;è·å–eflagsã€å†™eflags
+global	io_in8,io_in16,io_in32			;è¯»ç«¯å£8ä½ã€16ä½å’Œ32ä½
+global	io_out8,io_out16,io_out32		;å†™ç«¯å£8ä½ã€16ä½å’Œ32ä½
 
-;´úÂëÇø
+;ä»£ç åŒº
 [section .text]
 [bits 32]
 
-;ÊäÈëÊä³öº¯Êı
+;è¾“å…¥è¾“å‡ºå‡½æ•°
 io_hlt:
 	hlt
 	jmp		io_hlt

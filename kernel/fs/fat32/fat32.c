@@ -55,9 +55,9 @@ void init_FAT32(void)
 		PBR1.total_sector_num = PBR1.total_sector_num_16;
 	}
 	/*输出分区信息*/
-	//printk("Partition OEM:%s,FAT 32 version is 0x%X\n", &PBR1.OEM, PBR1.FAT_version);
-	//printk("Cluster size:%X,reserve:%X\n", PBR1.cluster_size, PBR1.reserve);
-	//printk("root max number:%X,root start:%X\n", PBR1.root_max_num, PBR1.root_start);
+	printk("Partition OEM:%s,FAT 32 version is 0x%X\n", &PBR1.OEM, PBR1.FAT_version);
+	printk("Cluster size:%X,reserve:%X\n", PBR1.cluster_size, PBR1.reserve);
+	printk("root max number:%X,root start:%X\n", PBR1.root_max_num, PBR1.root_start);
 }
 
 /*NOTES:由于目前完成的功能有限，下列函数中很多应有返回值来确定成功与失败，但是未实现*/
@@ -128,7 +128,7 @@ file_info get_file_info(u8 *name)
 					/*长度(Byte)*/
 					s.size = ((int *)root_point)[(table_point + 0x1C) / sizeof(u32)];
 					/*释放读取缓冲*/
-					kfree(root_point, (PBR1.cluster_size * 512));
+					oldkfree(root_point, (PBR1.cluster_size * 512));
 					return s;
 				}
 			}
@@ -151,7 +151,7 @@ u32 get_next_clu(u32 clu)
 	/*每个FAT表项4个字节，一个扇区可以装128个FAT表项*/
 	read_disk((PBR1.FAT_start + (clu / 128)), (unsigned short int*) point, 1);
 	next_clu = point[clu % 128];
-	kfree(point, PBR1.cluster_size * 512);
+	oldkfree(point, PBR1.cluster_size * 512);
 	return next_clu;
 }
 

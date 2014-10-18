@@ -1,10 +1,10 @@
-/*
- *Copyright 2013-2014 by Explorer Developer.
- *made by Hu wenjie(CN)<1@GhostBirdOS.org>
- *Explorer intel 8254 support
- *Explorer 0.01/arch/x86/include/i8259.h
- *version:1.0
- *7/26/2014 5:26 PM
+/**
+ * Copyright 2013-2014 by Explorer Developer.
+ * made by Hu wenjie(CN)<1@GhostBirdOS.org>
+ * Explorer intel 8254 support
+ * Explorer 0.01/arch/x86/include/i8259.h
+ * version:1.0
+ * 7/26/2014 5:26 PM
  */
 
 #include<stdlib.h>
@@ -36,7 +36,6 @@ static struct timer_task *current_task;/*Ö¸ÏòÈÎÎñ½á¹¹Á´±í×î½ü»á±»Ö´ÐÐµÄ±íÏî£¬Èç¹
 /**
  * ³õÊ¼»¯intel 8254Ð¾Æ¬º¯Êý
  * ¶ÔÏµÍ³Ê±¼ä±äÁ¿½øÐÐ³õÊ¼»¯
- * 
  */
 void init_PIT(void)
 {
@@ -69,7 +68,7 @@ void int_PIT_display(void)
 			settimer((*task_point).function, (*task_point).time_size, (*task_point).state);
 		}
 		current_task = (*task_point).next_task;
-		kfree(task_point, sizeof(struct timer_task));
+		oldkfree(task_point);
 		task_point = (*task_point).next_task;
 	}
 /*EOI£¬ÔÊÐí8259A¼ÌÐø½ÓÊÕÖÐ¶Ï*/
@@ -92,7 +91,7 @@ long settimer(void (*function)(void), unsigned long long time, unsigned char sta
 	
 	struct timer_task *new_task, *task_point;
 	task_point = current_task;
-	new_task = (struct timer_task *) kmalloc(sizeof(struct timer_task));
+	new_task = (struct timer_task *) oldkmalloc(sizeof(struct timer_task));
 	(*new_task).time_size = time;
 	(*new_task).time = sys_clock + time;
 	(*new_task).state = state;

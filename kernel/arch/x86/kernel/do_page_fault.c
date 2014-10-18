@@ -8,7 +8,6 @@
  */
 
 #include <lib/string.h>
-#include <process.h>
 #include "../include/memory.h"
 #include <types.h>
 
@@ -37,7 +36,6 @@ void do_page_fault(u32 error_code)
 		write_CR3(old_cr3);
 		return;
 	}else{
-	color(0xffff00);
 	printk("Page fault:(Unknown)error code:0x%X", error_code);
 	io_hlt();
 	}

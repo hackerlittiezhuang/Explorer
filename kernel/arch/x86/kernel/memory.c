@@ -54,7 +54,7 @@ void init_memory(void)
 			/*大于256MB的自由内存区间从256MB开始*/
 			mem_map[offset].start = 256 MB;
 			break;
-			//goto prepare_paging;
+			goto prepare_paging;
 		}
 	}
 
@@ -62,10 +62,10 @@ void init_memory(void)
  *creat PDT and PT
  *
  */
-/*
+
 prepare_paging:
-	pdt = (int *)kmalloc(4096);
-	pt = (int *)kmalloc(4096 * 1024);
+	pdt = (int *)oldkmalloc(4096);
+	pt = (int *)oldkmalloc(4096 * 1024);
 	for (offset = 0; offset < 1024; offset ++)
 	{
 		pdt[offset] = (offset * 0x1000) + (int)pt + 0x7;
@@ -75,7 +75,6 @@ prepare_paging:
 		pt[offset] = offset * 0x1000 + 0x7;
 	}
 	goto_paging(pdt);
-	*/
 	init_kmalloc();
 }
 
@@ -103,7 +102,6 @@ u32 get_free_page(void)
 	 *without available memory when running here
 	 */
 	
-	color(0xffff00);
 	printk("Page allocation error: not enough!");
 	io_hlt();
 }
@@ -143,9 +141,12 @@ void *oldkmalloc(size_t size)
 	 *because the function color and printk belong to shell.
 	 */
 	
-	color(0xffff00);
 	printk("kmalloc is error:Not enough memory!");
 	io_hlt();
+}
+
+void oldkfree(u32 addr, u32 size)
+{
 }
 
 /*虚拟空间映射*/

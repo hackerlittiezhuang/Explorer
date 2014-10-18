@@ -1,10 +1,10 @@
-/*
- *Copyright 2013-2014 by Explorer Developer.
- *made by 迷彩红星<1@GhostBirdOS.org>
- *Explorer x86平台硬件抽象层
- *ExplorerOS/Kernel/HAL/x86/fun_c.c
- *version:Alpha
- *7/14/2014 1:06 PM
+/**
+ * Copyright 2013-2014 by Explorer Developer.
+ * made by Hu wenjie(CN)<1@GhostBirdOS.org>
+ * Explorer x86平台硬件抽象层
+ * ExplorerOS/Kernel/HAL/x86/fun_c.c
+ * version:Alpha
+ * 7/14/2014 1:06 PM
  */
 
 #include "include/function.h"
@@ -28,7 +28,11 @@ void init_arch(void)
 	TSS_selector = creat_GDT(((u32)&TSS), sizeof(TSS), GDT_P + GDT_DPL_0 + GDT_TSS_data);
 }
 
-//进入分页模式
+/**
+ * 进入分页模式函数
+ * 分页模式是保护模式下一种可选的模式，对内存进行分页管理
+ * 实现分页模式可以
+ */
 void goto_paging(u32 pdt_addr)
 {
 	write_CR3(pdt_addr);

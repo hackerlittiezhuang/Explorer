@@ -62,7 +62,8 @@ void *kmalloc(size_t size)
 		}
 	}*/
 	/**暂时只分配128KB和64KB内存*/
-	if (size <= (64 * 128))
+	//if (size <= (64 * 128))
+	if (size <= 0)
 	{
 		/**如果没有足够的内存，先准备*/
 		if (mem_pool.available_64KB == 0)
@@ -120,6 +121,27 @@ void *kmalloc(size_t size)
 
 void kfree(void *point)
 {
+	unsigned long n;
+	for (n = 0; n < NUMBER_OF_128KB; n++)
+	{
+		if (mem_pool.mem_128KB[n].base == point)
+		{
+			mem_pool.mem_128KB[n].attr = AVAILABLE_TABLE;
+			mem_pool.available_128KB ++;
+			return;
+		}
+	}
+	
+	for (n = 0; n < NUMBER_OF_64KB; n++)
+	{
+		if (mem_pool.mem_64KB[n].base == point)
+		{
+			mem_pool.mem_64KB[n].attr = AVAILABLE_TABLE;
+			mem_pool.available_64KB ++;
+			return;
+		}
+	}
+	return;
 }
 
 static unsigned long alloc_128KB_to_64KB(void *point)

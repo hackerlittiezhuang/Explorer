@@ -31,6 +31,6 @@ extern int_PIT;
 
 void init_PIT(void);
 void int_PIT_display(void);
-int_long settimer(void (*function)(void), unsigned long long time, unsigned char state);
+long settimer(void (*function)(void), unsigned long long time, unsigned char state);
 
 #endif

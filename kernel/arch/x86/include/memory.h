@@ -18,6 +18,7 @@ u32 *pdt;
 
 void inti_memory(void);
 void *oldkmalloc(size_t size);
+void oldkfree(u32 addr, u32 size);
 u32 kmap(u32 vir_addr, u32 phy_addr, u32 size);
 void kmemcpy(u8 *source, u8 *object, u32 count);
 int32 creat_pdt(u32 *point);

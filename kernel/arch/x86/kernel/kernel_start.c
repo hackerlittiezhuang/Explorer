@@ -1,10 +1,10 @@
-/*
- *Copyright 2013-2014 by Explorer Developer.
- *made by Rose<roselyu@163.com> Hu wenjie(CN)<1@GhostBirdOS.org>
- *Explorer initialization in the start of kernel
- *Explorer 0.01/arch/x86/kernel/kernel_start.c
- *version:Alpha
- *9/14/2014 12:30 PM
+/**
+ * Copyright 2013-2014 by Explorer Developer.
+ * made by Rose<roselyu@163.com> Hu wenjie(CN)<1@GhostBirdOS.org>
+ * Explorer initialization in the start of kernel
+ * Explorer 0.01/arch/x86/kernel/kernel_start.c
+ * version:Alpha
+ * 9/14/2014 12:30 PM
  */
 
 #include <lib/string.h>
@@ -18,9 +18,11 @@ void kernel_start(void)
 	init_arch();
 	init_memory();
 	init_trap();
+	init_task();
 	init_dev();
 	init_graph();
 	init_shell();
+	fin:goto fin;
 }
 
 /*initialization device which we need*/
@@ -167,11 +169,9 @@ void init_CPU(void)
 void output_CPU_info(void)
 {
 	unsigned int brands[4]; //Ã¿´ÎµÄeax¡¢ebx¡¢ecx¡¢edx
-        unsigned int i;
+	unsigned int i;
 
-	color(0xffff0000);
 	printk("\n##CPU Information: ");
-color(0xffffffff);
         for (i = 0x80000002; i <= 0x80000004; i++) {
             asm volatile ("cpuid"
                       : "=a"(brands[0]), "=b"(brands[1]), "=c"(brands[2]), "=d"(brands[3])
@@ -180,7 +180,6 @@ color(0xffffffff);
             printk("%s", (char *)brands);
         }
 printk("\n\n");
-color(0xffffff00);
 	printk("CPU's manufacturer ID:%s\n", &CPU_OEM);
 	printk("CPUID support in MAX:0x%X,extended CPUID support in MAX:0x%X.\n", CPU_MAXID, CPU_EMAXID);
 	printk("CPU family:%s[0x%X],model:%s[0x%X].\n", CPU_family,display_family, CPU_model, display_model);

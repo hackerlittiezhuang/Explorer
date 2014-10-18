@@ -38,48 +38,41 @@ void init_trap_of_processor(void)
 
 void int_Divide_error(void)
 {
-	color(0xff0000);
 	printk("Divide error!!!");
 	io_hlt();
 }
 
 void int_Break_point(void)
 {
-	color(0xff0000);
 	printk("Break point!!!");
 	io_hlt();
 }
 
 void int_Over_flow(void)
 {
-	color(0xff0000);
 	printk("Over flow!!!");
 	io_hlt();
 }
 
 void int_Un_define(void)
 {
-	color(0xff0000);
 	printk("Undefine!!!");
 	io_hlt();
 }
 
 void int_Double_fault(void)
 {
-	color(0xff0000);
 	printk("Double fault!!!");
 	io_hlt();
 }
 
 void int_Invalid_TSS(void)
 {
-	color(0xff0000);
 	printk("Invalid TSS!!!");
 	io_hlt();
 }
 
 void int_General_protection(u32 error_code)
 {
-	color(0xff0000);
 	printk("General protection interrupt:error code:0x%X", error_code);
 }
