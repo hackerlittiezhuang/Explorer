@@ -1,8 +1,8 @@
 /*
  *Copyright 2013-2014 by Explorer Developer.
  *made by Rose<roselyu@163.com>
- *Explorer Font Register
- *ExplorerOS/Kernel/lib/font.c
+ *Explorer Font Header
+ *ExplorerOS/include/font.h
  *version:Alpha
  *18/10/2014
  */
