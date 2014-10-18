@@ -11,13 +11,14 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <types.h>
-#include <font.h>
+
 
 static struct shell_frame shell;
 static struct shell_window main_window;
-
+unsigned char *font;
 void init_shell(void)
 {
+	font = get_font_addr("Standard Font");
 	shell.map_window = &main_window;
 	if (xsize <= SHELL_MAX_LENGTH) shell.length = xsize;
 	else shell.length = SHELL_MAX_LENGTH;
@@ -67,7 +68,7 @@ void draw_font(unsigned long x, unsigned long y, unsigned int color, unsigned ch
 	font_offset = ascii * 16;
 	for (i = 0; i < 16; i++)
 	{
-		d = standard_font[font_offset + i];
+		d = font[font_offset + i];
 		if ((d & 0x80) != 0) { put_pix_24(x, y + i, color); }
 		if ((d & 0x40) != 0) { put_pix_24(x + 1, y + i, color); }
 		if ((d & 0x20) != 0) { put_pix_24(x + 2, y + i, color); }

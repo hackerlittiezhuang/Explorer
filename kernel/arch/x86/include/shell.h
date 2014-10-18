@@ -35,8 +35,7 @@ struct shell_window
 	unsigned long write_point;
 };
 
-//×Ö¿â
-extern u8 font[256*16];
+
 //ÆÁÄ»¿í¶È
 extern u32 xsize;
 extern u32 ysize;

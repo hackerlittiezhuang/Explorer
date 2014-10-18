@@ -21,5 +21,5 @@ void init_font(void);
 long regfont(unsigned char *name,unsigned char *addr);
 unsigned char *get_font_addr(unsigned char *name);
 //Other Fonts here.
-unsigned char standard_font[FONTDATAMAX];
-unsigned char simsun[FONTDATAMAX];
+static unsigned char standard_font[FONTDATAMAX];
+static unsigned char simsun[FONTDATAMAX];
