@@ -12,7 +12,6 @@ set n=For v14 Series
 if exist new13 (set new13=y)
 goto main
 :done
-color 0f
 title %t% - Done
 	echo.
 	echo.
@@ -32,6 +31,7 @@ cls
 	echo Here is error information:
 	type tmp\error.log
 goto done
+
 
 ::Main
 :main
@@ -73,19 +73,12 @@ echo ** Unknown Command. Press Any Key to Return.
 pause > nul
 goto main
 :all
-
 set debug=y
 goto compile
 :debug
 goto compile
 :publish
 color 0c
-cls
-echo Are you sure to PUBLISH?(Press any key for 3 times)
-pause>nul
-cls
-echo Are you sure to PUBLISH?(Press any key for 2 times)
-pause>nul
 cls
 echo Are you sure to PUBLISH?(Press any key to continue)
 color f
@@ -196,9 +189,9 @@ cls
 	echo ==============================================================
 	echo.
 	if exist "updates.txt" (notepad "updates.txt"&goto done)
-	if exist "Smilodon Log.txt" (notepad "Smilodon Log.txt") else (echo Document not found.)
 goto done
 :deltmp
+cls
 del /s /f /q KERNEL>nul 2>nul
 del /s /f /q *.o>nul 2>nul
 del /s /f /q *.bin>nul 2>nul
