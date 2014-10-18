@@ -19,6 +19,10 @@ unsigned char *font;
 void init_shell(void)
 {
 	font = get_font_addr("Standard Font");
+	if (font == NULL)
+	{
+		err:goto err;
+	}
 	shell.map_window = &main_window;
 	if (xsize <= SHELL_MAX_LENGTH) shell.length = xsize;
 	else shell.length = SHELL_MAX_LENGTH;
