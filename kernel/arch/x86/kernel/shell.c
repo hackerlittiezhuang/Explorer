@@ -30,7 +30,7 @@ void init_shell(void)
 	
 	/*定时*/
 	//settimer(&refresh_shell, 100, 0);
-	font=get_font_addr("Standard Font");
+	font=get_font_addr("linux_sun");
 	/**初始化框架*/
 	/*shell_frame.length = xsize;
 	shell_frame.width = ysize;*/

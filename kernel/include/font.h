@@ -25,3 +25,4 @@ unsigned char *get_font_addr(unsigned char *name);
 //Other Fonts here.
 unsigned char standard_font[FONTDATAMAX];
 unsigned char simsun[FONTDATAMAX];
+unsigned char linux_sun[FONTDATAMAX];

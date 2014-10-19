@@ -24,6 +24,7 @@ void init_font(void)
 	//Register all the fonts
 		regfont("simsun",simsun);
 		regfont("Standard Font",standard_font);
+		regfont("linux_sun",linux_sun);
 }
 
 long regfont(unsigned char *name,unsigned char *addr)

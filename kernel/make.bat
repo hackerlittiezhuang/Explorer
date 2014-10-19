@@ -117,6 +117,7 @@ echo -------------------------------------->tmp\error.log
 	call pcc.cmd -c lib\fonts\font.c -o tmp\font.o -I "%cd%\include"
 	call pcc.cmd -c lib\fonts\standard_font.c -o tmp\standard_font.o -I "%cd%\include"
 	call pcc.cmd -c lib\fonts\simsun.c -o tmp\simsun.o -I "%cd%\include"
+	call pcc.cmd -c lib\fonts\linux_sun.c -o tmp\linux_sun.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\memory.c -o tmp\memory.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\kmalloc.c -o tmp\kmalloc.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\do_page_fault.c -o tmp\do_page_fault.o -I "%cd%\include"
@@ -140,7 +141,7 @@ echo -^> 链接目标文件...
 	::Link
 	ld -o tmp\kernel.o	-Ttext 0x11000^
 	tmp\_start.o tmp\kernel_start.o tmp\main.o^
-	tmp\shell.o tmp\font.o tmp\standard_font.o tmp\simsun.o^
+	tmp\shell.o tmp\font.o tmp\standard_font.o tmp\simsun.o tmp\linux_sun.o^
 	tmp\hdd.o tmp\video.o tmp\mouse.o tmp\keyboard.o tmp\i8254.o tmp\i8254_asm.o tmp\dev_intr.o^
 	tmp\i8259.o^
 	tmp\task.o^

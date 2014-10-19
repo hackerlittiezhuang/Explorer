@@ -1,8 +1,8 @@
 /*
  *Copyright 2013-2014 by Explorer Developer and Zhongyi Eletric Ltd.
  *made by Zhongyi Eletric Ltd.
- *Explorer Font Register
- *ExplorerOS/Kernel/lib/font.c
+ *Explorer Simsun Font
+ *ExplorerOS/Kernel/lib/simsun.c
  *version:Alpha
  *19/10/2014
  */
