@@ -12,6 +12,8 @@
 // *font_addr : address of the font
 //
 #define FONTDATAMAX 4096
+#define FONTREGMAX 10
+//Max Number of sysfont array members
 struct fontstr{
 unsigned char *font_name;
 unsigned char *font_addr;
