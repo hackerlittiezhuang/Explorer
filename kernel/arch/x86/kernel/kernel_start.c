@@ -25,7 +25,7 @@ void kernel_start(void)
 	init_font();
 	init_graph();
 	init_shell();
-	fin:goto fin;
+	//fin:goto fin;
 }
 
 /*initialization device which we need*/

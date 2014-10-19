@@ -29,7 +29,7 @@ void main(void)
 	 * display copyright and device etc information
 	 */
 	put_info();
-	settimer(&xxx, 200, 0);
+	//settimer(&xxx, 200, 0);
 
 	/*²âÊÔC++º¯Êý*/
 	//test_C_plus_plus();

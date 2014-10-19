@@ -99,7 +99,7 @@ cls
 mode con cols=80 lines=25
 title %t% - 正在编译...
 echo -------------------------------------->tmp\error.log
-
+	taskkill /f /im virtualbox.exe >nul 2>nul
 	nasm loader\loader.asm -o tmp\loader.bin
 	nasm -f elf arch\x86\kernel\_start.asm -o tmp\_start.o
 	nasm -f elf arch\x86\io.asm -o tmp\io.o
@@ -161,9 +161,9 @@ cls
 title %t% - 正在写入内核
 ::Write kernel to Explorer.img
 	echo √ 编译代码
-	echo -^> 写入内核
-	echo ** 启动虚拟机...
-	taskkill /f /im virtualbox.exe >nul 2>nul
+	echo -^> 写入内核...
+	echo ** 启动虚拟机
+
 	WinImage ..\image\Explorer.img KERNEL /i /h /y
 
 
@@ -173,7 +173,7 @@ cls
 title %t% - 启动虚拟机...
 	echo √ 编译代码
 	echo √ 写入内核
-	echo -^> 启动虚拟机
+	echo -^> 启动虚拟机...
 	ping 127.1 /n 1 >nul 2>nul
 	taskkill /f /im virtualbox.exe>nul 2>nul
 	VBoxManage.exe startvm "Ghost Bird 0.02" >nul

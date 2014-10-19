@@ -1,60 +1,173 @@
 /**
  * Copyright 2013-2014 by Explorer Developer.
  * made by Hu wenjie(CN)<1@GhostBirdOS.org>
- * Explorer kernel Shell
+ * Explorer Old Kernel Shell
  * Explorer 0.01/shell/shell.c
  * version:Alpha
  * 7/5/2014 7:08 PM
  */
-
+ 
 #include "../include/shell.h"
 #include <stdarg.h>
-#include <stdbool.h>
-#include <stdlib.h>
 #include <types.h>
 #include <font.h>
 
+struct shell{
+	u32 x;
+	u32 y;
+	u32 width;
+	u32 height;
+	u32 cursor;
+	u32 size;
+	u32 color;
+}shell;
 
-static struct shell_frame shell;
-static struct shell_window main_window;
-unsigned char *font;
+
+//static struct shell_frame shell_frame;
+
 void init_shell(void)
 {
-	font = get_font_addr("Standard Font");
-	shell.map_window = &main_window;
-	if (xsize <= SHELL_MAX_LENGTH) shell.length = xsize;
-	else shell.length = SHELL_MAX_LENGTH;
-	if (ysize <= SHELL_MAX_WIDTH) shell.width = ysize;
-	else shell.width = SHELL_MAX_WIDTH;
 	
-	main_window.title = "Hello,world!";
-	shell.refresh_title_flag = true;
-	shell.refresh_window_flag = true;
-	shell.refresh_task_bar_flag = true;
-	shell.refresh_deta_flag = true;
-	/**è®¾ç½®å®šæ—¶å™¨ï¼Œç”¨äºŽåˆ·æ–°ç•Œé¢*/
-	settimer(&refresh_shell, 100, 0);
+	/*¶¨Ê±*/
+	//settimer(&refresh_shell, 100, 0);
+	font=get_font_addr("Standard Font");
+	/**³õÊ¼»¯¿ò¼Ü*/
+	/*shell_frame.length = xsize;
+	shell_frame.width = ysize;*/
+	/*initialize virtual text mode*/
+	shell.width = xsize / 8;
+	shell.height = ysize / 16;
+	shell.x = (xsize - (shell.width * 8))/2;
+	shell.y = (ysize - (shell.height * 16))/2;
+	shell.cursor = 0;
+	shell.size = shell.width * shell.height;
+	shell.color = 0xffffffff;
 }
 
 int printk(const char *fmt, ...)
 {
+	/**
+	 *variable parameter
+	 *va_list\va_start\va_arg\va_end all in Explorer/include
+	 */
+	
+	va_list arg_ptr;
+	va_start(arg_ptr, fmt);
+	char *ch1;
+	unsigned int int_val;
+	do
+	{
+		if (*fmt == '%')
+		{
+			fmt++;
+			switch(*fmt)
+			{
+				case 'd':
+				break;
+				/*hex to string*/
+				case 'X':
+					int_val = va_arg(arg_ptr, unsigned int);
+					char shr;
+					for (shr = 28; shr >= 0; shr -= 4)
+					{
+						if ((((int_val) >> shr) & 0xf) <= 9)
+						{
+							put_font((((int_val) >> shr) & 0xf) + 0x30);
+						}else{
+							put_font((((int_val) >> shr) & 0xf) + 0x37);
+						}
+					}
+				break;
+				
+				/*output string*/
+				case 's':
+					ch1 = va_arg(arg_ptr, char *);
+					for (; *ch1 != 0x00; ch1++)
+					{
+						put_font(*ch1);
+					}
+				break;
+				/*output char "%"*/
+				case '%':
+					put_font('%');
+				break;
+				/*nothing*/
+				default:
+					put_font(*fmt);
+				break;
+			}
+		}else{
+			put_font(*fmt);
+		}
+	}while (*fmt++);
+	va_end(arg_ptr);
 }
 
-void draw_square(unsigned long x, unsigned long y, unsigned long height, unsigned long width, unsigned int color)
+void debug(u32 *address, u32 size)
 {
-	unsigned long m, n;
-	for (n = 0; n != width; n ++)
+	printk("debug:from 0x%X to 0x%X is:\n", address, address+size);
+	for (; size > 0; size -= 4)
 	{
-		for (m = 0; m != height; m ++)
+		printk("%X ",*address);
+		address ++;
+	}
+	printk("\n");
+	return;
+}
+
+/*ÏòÉÏ¹öÆÁ¹¦ÄÜº¯Êý*/
+void scr_up(void)
+{
+	u32 x,y;
+	for (y = shell.y; y < (shell.y + ((shell.height - 1) * 16)); y ++)
+	{
+		for (x = shell.x; x < (shell.x + (shell.width * 8)); x ++)
 		{
-			put_pix_24(x + m, y + n, color);
+			put_pix_24(x, y, get_pix_24(x, (y + 16)));
+			put_pix_24(x, (y + 16), 0x00000000);
 		}
 	}
+	shell.cursor -= shell.width;
+	return;
 }
 
-void put_string(unsigned long x, unsigned long y, unsigned int color, unsigned char *string)
+/*ÉèÖÃÑÕÉ«*/
+void color(u32 color)
 {
-	unsigned long point;
+	shell.color = color;
+}
+
+/*Êä³ö×Ö*/
+void put_font(u8 ascii)
+{
+	/*»»ÐÐ¼üµÄÅÐ¶Ï*/
+	if ((ascii == 0x0a))
+	{
+		shell.cursor -= (shell.cursor % shell.width);
+		shell.cursor += shell.width;
+	}
+
+	/*¶ÔÊÇ·ñÐèÒª¹öÆÁÅÐ¶Ï*/
+	if (shell.cursor >= shell.size) {
+		scr_up();
+	}
+	if (ascii < 0x20)/*¶Ô¿ØÖÆ×Ö·ûµÄÅÐ¶Ï*/
+	{
+		return;
+	}
+	/*ÓÉÄ£ÄâÎÄ±¾Ä£Ê½²ÎÊýµ½Êµ¼ÊÍ¼ÐÎÄ£Ê½µÄ×ª»»*/
+	u32 x, y;
+	x = shell.x + (shell.cursor % shell.width) * 8;
+	y = shell.y + (shell.cursor / shell.width) * 16;
+	/*µ÷ÓÃÏÔÊ¾º¯Êý*/
+	draw_font(x, y, shell.color, ascii);
+	/*Ä£Äâ¹â±êÖ¸ÏòÏÂÒ»¸öµ¥Î»*/
+	shell.cursor ++;
+}
+
+put_string(u32 x, u32 y, u32 color, u8 *string)
+{
+	u32 point;
 	for (point = 0; string[point] != 0x00; point ++)
 	{
 		draw_font(x, y, color, string[point]);
@@ -62,11 +175,11 @@ void put_string(unsigned long x, unsigned long y, unsigned int color, unsigned c
 	}
 }
 
-/*æ˜¾ç¤ºå­—*/
-void draw_font(unsigned long x, unsigned long y, unsigned int color, unsigned char ascii)
+/*ÏÔÊ¾×Ö*/
+void draw_font(u32 x, u32 y, u32 color, u8 ascii)
 {
-	unsigned long p, i, font_offset;/*å­—åº“åç§»é‡*/
-	unsigned char d;
+	u32 p, i, font_offset;/*×Ö¿âÆ«ÒÆÁ¿*/
+	u8 d;
 	font_offset = ascii * 16;
 	for (i = 0; i < 16; i++)
 	{
@@ -82,39 +195,15 @@ void draw_font(unsigned long x, unsigned long y, unsigned int color, unsigned ch
 	}
 }
 
-void refresh_deta(void)
+void draw_square(u32 x, u32 y, u32 width, u32 height, u32 color)
 {
-	/**23:30PM 10/18/2014æ ¼å¼*/
-	draw_square((shell.length - (18 * 8)), (shell.width - 16), (18 * 8), 16, 0x808080);
-	put_string((shell.length - (18 * 8)), (shell.width - 16), 0xffffff, "01:50AM 10/18/2014");
-	shell.refresh_deta_flag = false;
-	return;
+	u32 m, n;
+	for (n = 0; n != height; n ++)
+	{
+		for (m = 0; m != width; m ++)
+		{
+			put_pix_24(x + m, y + n, color);
+		}
+	}
 }
 
-void refresh_task_bar(void)
-{
-	draw_square(0, (shell.width - 16), (shell.length - (18 * 8)), 16, 0x000066);
-	shell.refresh_task_bar_flag = false;
-}
-
-void refresh_title(void)
-{
-	draw_square(0, 0, shell.length, 16, 0xff0000);
-	put_string(0, 0, 0xffffff, (*shell.map_window).title);
-	shell.refresh_title_flag = false;
-	return;
-}
-
-void refresh_window(void)
-{
-	draw_square(0, 16, shell.length, (shell.width - (2 * 16)), 0x333333);
-	shell.refresh_window_flag = false;
-}
-
-void refresh_shell(void)
-{
-	if (shell.refresh_title_flag == true) refresh_title();
-	if (shell.refresh_window_flag == true) refresh_window();
-	if (shell.refresh_task_bar_flag == true) refresh_task_bar();
-	if (shell.refresh_deta_flag == true) refresh_deta();
-}
