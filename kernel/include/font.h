@@ -6,7 +6,8 @@
  *version:Alpha
  *18/10/2014
  */
-#pragma
+#ifndef FONT_H_
+#define FONT_H_
 // Font Structure
 // *font_name : name of the font
 // *font_addr : address of the font
@@ -14,15 +15,23 @@
 #define FONTDATAMAX 4096
 #define FONTREGMAX 10
 //Max Number of sysfont array members
-struct fontstr{
+struct fontreg{
 unsigned char *font_name;
 unsigned char *font_addr;
+unsigned int width;
+unsigned int height;
+unsigned char *intro;
 };
-
+//Font is a structure of font register.
+//Sysfont is the default font register.
 void init_font(void);
-long regfont(unsigned char *name,unsigned char *addr);
+long regfont(unsigned char *font_name,unsigned char *font_addr,unsigned int width,unsigned int height,unsigned char *intro);
+//get_font_addr will be reserved till when shell supports customize font width and height.
 unsigned char *get_font_addr(unsigned char *name);
+struct fontreg *get_font_info(unsigned char *name);
 //Other Fonts here.
 unsigned char standard_font[FONTDATAMAX];
 unsigned char simsun[FONTDATAMAX];
 unsigned char linux_sun[FONTDATAMAX];
+
+#endif

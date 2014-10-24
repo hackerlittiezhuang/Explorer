@@ -10,7 +10,7 @@ cls
 	echo ** ±§Ç¸ ´úÂë³ö´í
 	echo.
 	echo ´íÎóÏêÇé:
-	type tmp\error.log
+	type tmp\error.log|more
 	echo [°´ÈÎÒâ¼ü·µ»Ø]
 pause>nul
 start make.bat

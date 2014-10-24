@@ -32,7 +32,7 @@ cls
 	echo ** ±§Ç¸ Á´½Ó»ò±àÒë´íÎó
 	echo.
 	echo ´íÎóÏêÇé:
-	type tmp\error.log
+	type tmp\error.log|more
 goto done
 
 
