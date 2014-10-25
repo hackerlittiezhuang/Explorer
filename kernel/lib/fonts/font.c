@@ -7,7 +7,8 @@
  *18/10/2014
  */
 
-#include <font.h>
+#include <lib/fonts/font.h>
+#include <lib/string.h>
 #include <stdlib.h>
 
 struct fontreg sysfont[FONTREGMAX];
@@ -31,9 +32,9 @@ void init_font(void)
 	sysfont[0].width=0;
 	sysfont[0].intro=NULL;
 	//Register all the fonts
-		regfont("simsun",simsun,8,16,"simsun (from Microsoft Windows)");
-		regfont("Standard Font",standard_font,8,16,"Console Standard Font (from Linux)");
-		regfont("linux_sun",linux_sun,8,16,"Linux Simsun");
+		Register_simsun();
+		Register_standard_font();
+		Register_linux_sun();
 }
 
 long regfont(unsigned char *font_name,unsigned char *font_addr,unsigned int width,unsigned int height,unsigned char *intro)

@@ -2,13 +2,15 @@
  *Copyright 2013-2014 by Explorer Developer.
  *made by Hu wenjie(CN)<1@GhostBirdOS.org>,Linus Torvalds,Rose<roselyu@163.com>
  *Explorer Standard Font
- *ExplorerOS/Kernel/lib/fonts/standard_font.c
+ *Explorer/lib/fonts/standard_font.c
  *version:Alpha
  *18/10/2014
  */
 
 
-#include <font.h>
+#include <lib/fonts/font.h>
+
+#define FONTDATAMAX 4096
 
 unsigned char standard_font[FONTDATAMAX] = {
 
@@ -4621,3 +4623,8 @@ unsigned char standard_font[FONTDATAMAX] = {
 	0x00, /* 00000000 */
 
 };
+
+void Register_standard_font(void)
+{
+	regfont("Standard Font", standard_font, 8, 16, "Console Standard Font (from Linux)");
+}
