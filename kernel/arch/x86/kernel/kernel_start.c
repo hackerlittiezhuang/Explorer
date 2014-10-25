@@ -9,7 +9,6 @@
 
 #include <lib/string.h>
 #include <stdbool.h>
-#include <font.h>
 #include "../include/kernel_start.h"
 /**This file including some of CPU family or model string*/
 #include "../include/CPU.h"
@@ -21,11 +20,10 @@ void kernel_start(void)
 	init_trap();
 	init_task();
 	init_dev();
-	//Display Initialization
-	init_font();
 	init_graph();
+	init_font();
 	init_shell();
-	//fin:goto fin;
+	fin:goto fin;
 }
 
 /*initialization device which we need*/
@@ -118,19 +116,41 @@ void init_CPU(void)
 		if (display_family == 0x6)
 		{
 			CPU_family = CPU_family_06H;
-			CPU_model = CPU_model_Unknown;
+			if (display_model == 0x2a)
+			{
+				CPU_model = CPU_model_06_2AH;
+			}else if (display_model == 0xf)
+			{
+				/**
+				 *This place short-write CPU model because there are to many CPU
+				 *use this family and model,done this if you need support another CPU in
+				 *this family and model,you can visited page 3091 in
+				 *<Intel 64 and IA-32 architectures software developer's Manual>
+				 */
+				CPU_model = CPU_model_06_0FH;
+			}
 			
 		}else if (display_family == 0xf)
 		{
 			CPU_family = CPU_family_0FH;
-			CPU_model = CPU_model_Unknown;
 		}else{
 			CPU_family = CPU_family_Unknown;
-			CPU_model = CPU_model_Unknown;
 		}
 	}else if (strncmp(CPU_OEM, "AuthenticAMD", 12) == 0)
 	{
 		CPU_family = CPU_family_AMD;
+		CPU_model = CPU_model_Unknown;
+	}else if (strncmp(CPU_OEM, "AMDisbetter!", 12) == 0)
+	{
+		CPU_family = CPU_family_AMDK5;
+		CPU_model = CPU_model_Unknown;
+	}else if (strncmp(CPU_OEM, "SiS SiS SiS ", 12) == 0)
+	{
+		CPU_family = CPU_family_SiS;
+		CPU_model = CPU_model_Unknown;
+	}else if (strncmp(CPU_OEM, "VIA VIA VIA ", 12) == 0)
+	{
+		CPU_family = CPU_family_VIA;
 		CPU_model = CPU_model_Unknown;
 	}else if (strncmp(CPU_OEM, "Microsoft Hv", 12) == 0)
 	{
@@ -163,5 +183,5 @@ void output_CPU_info(void)
 printk("\n\n");
 	printk("CPU's manufacturer ID:%s\n", &CPU_OEM);
 	printk("CPUID support in MAX:0x%X,extended CPUID support in MAX:0x%X.\n", CPU_MAXID, CPU_EMAXID);
-	printk("CPU family:%s[0x%X].\n", CPU_family,display_family, CPU_model, display_model);
+	printk("CPU family:%s[0x%X],model:%s[0x%X].\n", CPU_family,display_family, CPU_model, display_model);
 }

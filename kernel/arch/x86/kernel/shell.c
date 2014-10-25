@@ -1,173 +1,106 @@
 /**
  * Copyright 2013-2014 by Explorer Developer.
  * made by Hu wenjie(CN)<1@GhostBirdOS.org>
- * Explorer Old Kernel Shell
- * Explorer 0.01/shell/shell.c
+ * Explorer kernel Shell
+ * Explorer/arch/x86/kernel/shell.c
  * version:Alpha
  * 7/5/2014 7:08 PM
  */
- 
+
 #include "../include/shell.h"
+#include <lib/fonts/font.h>
 #include <stdarg.h>
+#include <stdbool.h>
+#include <stdlib.h>
 #include <types.h>
-#include <font.h>
 
-struct shell{
-	u32 x;
-	u32 y;
-	u32 width;
-	u32 height;
-	u32 cursor;
-	u32 size;
-	u32 color;
-}shell;
+unsigned char *font;
 
+/**æ ¼å¼åŒ–å­—ç¬¦ä¸²ç¼“å†²åŒº*/
+char string_buffer[SIZE_OF_STRBUFFER];
 
-//static struct shell_frame shell_frame;
+static struct shell_frame shell;
+static struct shell_window main_window;
 
 void init_shell(void)
 {
+	/**è·å¾—å­—åº“ä¿¡æ¯*/
+	font = get_font_addr("linux_sun");
+	/**æ˜ å°„ä¸»çª—å£*/
+	shell.map_window = &main_window;
+	/**
+	 * è®¾å®šshellçš„å¤§å°ï¼Œä¸€èˆ¬å°†è·Ÿçª—å£ä¸€æ ·å¤§ã€‚
+	 * å¦‚æœçª—å£æ¯”è®¾è®¡æœ€å¤§å€¼è¿˜è¦å¤§ï¼Œå°±è®¾ç½®ä¸ºè®¾è®¡æœ€å¤§å€¼ã€‚
+	 */
+	if (xsize <= SHELL_MAX_LENGTH)
+	{
+		shell.length = xsize;
+	}else{
+		shell.length = SHELL_MAX_LENGTH;
+	}
+	if (ysize <= SHELL_MAX_WIDTH)
+	{
+		shell.width = ysize;
+	}else{
+		shell.width = SHELL_MAX_WIDTH;
+	}
+	/**ä¸»çª—å£çš„è®¾å®š*/
+	main_window.title = "Hello,world!";
+	main_window.output_backdrop_color = 0x333333;
+	main_window.write_point = 0;
+	/**å‡†å¤‡å¥½äº†åå…è®¸åˆ·æ–°*/
+	shell.refresh_title_flag = true;
+	shell.refresh_window_flag = true;
+	shell.refresh_task_bar_flag = true;
+	shell.refresh_deta_flag = true;
+	/**è®¾ç½®å®šæ—¶å™¨ï¼Œç”¨äºåˆ·æ–°ç•Œé¢*/
+	settimer(&refresh_shell, 100, 0);
 	
-	/*¶¨Ê±*/
-	//settimer(&refresh_shell, 100, 0);
-	font=get_font_addr("linux_sun");
-	/**³õÊ¼»¯¿ò¼Ü*/
-	/*shell_frame.length = xsize;
-	shell_frame.width = ysize;*/
-	/*initialize virtual text mode*/
-	shell.width = xsize / 8;
-	shell.height = ysize / 16;
-	shell.x = (xsize - (shell.width * 8))/2;
-	shell.y = (ysize - (shell.height * 16))/2;
-	shell.cursor = 0;
-	shell.size = shell.width * shell.height;
-	shell.color = 0xffffffff;
+	printk("Hello,world!%s","This is string.");
+}
+
+void put_font(u8 ascii)
+{
 }
 
 int printk(const char *fmt, ...)
 {
-	/**
-	 *variable parameter
-	 *va_list\va_start\va_arg\va_end all in Explorer/include
-	 */
-	
-	va_list arg_ptr;
-	va_start(arg_ptr, fmt);
-	char *ch1;
-	unsigned int int_val;
+	va_list arg;
+	int n;
+	va_start(arg,fmt);/*åˆå§‹åŒ–å‚æ•°æŒ‡é’ˆ*/
+	n = _vsnprintf(string_buffer, SIZE_OF_STRBUFFER, fmt, arg);/*æ ¼å¼åŒ–å†™å…¥ç¼“å­˜å¹¶è¿”å›é•¿åº¦*/
+	va_end(arg);/*å¤„ç†æŒ‡é’ˆï¼Œé˜²æ­¢è¯¯æ“ä½œ*/
+	return n;
+}
+
+int _vsnprintf(char* str, size_t size, const char* fmt, va_list arg)
+{
 	do
 	{
-		if (*fmt == '%')
+		if (*fmt == 0x00)
 		{
-			fmt++;
-			switch(*fmt)
-			{
-				case 'd':
-				break;
-				/*hex to string*/
-				case 'X':
-					int_val = va_arg(arg_ptr, unsigned int);
-					char shr;
-					for (shr = 28; shr >= 0; shr -= 4)
-					{
-						if ((((int_val) >> shr) & 0xf) <= 9)
-						{
-							put_font((((int_val) >> shr) & 0xf) + 0x30);
-						}else{
-							put_font((((int_val) >> shr) & 0xf) + 0x37);
-						}
-					}
-				break;
-				
-				/*output string*/
-				case 's':
-					ch1 = va_arg(arg_ptr, char *);
-					for (; *ch1 != 0x00; ch1++)
-					{
-						put_font(*ch1);
-					}
-				break;
-				/*output char "%"*/
-				case '%':
-					put_font('%');
-				break;
-				/*nothing*/
-				default:
-					put_font(*fmt);
-				break;
-			}
-		}else{
-			put_font(*fmt);
+			fin:goto fin;
 		}
+		(*shell.map_window).output[(*shell.map_window).write_point] = *fmt;
+		(*shell.map_window).write_point ++;
 	}while (*fmt++);
-	va_end(arg_ptr);
 }
 
-void debug(u32 *address, u32 size)
+void draw_square(unsigned long x, unsigned long y, unsigned long height, unsigned long width, unsigned int color)
 {
-	printk("debug:from 0x%X to 0x%X is:\n", address, address+size);
-	for (; size > 0; size -= 4)
+	unsigned long m, n;
+	for (n = 0; n != width; n ++)
 	{
-		printk("%X ",*address);
-		address ++;
-	}
-	printk("\n");
-	return;
-}
-
-/*ÏòÉÏ¹öÆÁ¹¦ÄÜº¯Êı*/
-void scr_up(void)
-{
-	u32 x,y;
-	for (y = shell.y; y < (shell.y + ((shell.height - 1) * 16)); y ++)
-	{
-		for (x = shell.x; x < (shell.x + (shell.width * 8)); x ++)
+		for (m = 0; m != height; m ++)
 		{
-			put_pix_24(x, y, get_pix_24(x, (y + 16)));
-			put_pix_24(x, (y + 16), 0x00000000);
+			put_pix_24(x + m, y + n, color);
 		}
 	}
-	shell.cursor -= shell.width;
-	return;
 }
 
-/*ÉèÖÃÑÕÉ«*/
-void color(u32 color)
+void put_string(unsigned long x, unsigned long y, unsigned int color, unsigned char *string)
 {
-	shell.color = color;
-}
-
-/*Êä³ö×Ö*/
-void put_font(u8 ascii)
-{
-	/*»»ĞĞ¼üµÄÅĞ¶Ï*/
-	if ((ascii == 0x0a))
-	{
-		shell.cursor -= (shell.cursor % shell.width);
-		shell.cursor += shell.width;
-	}
-
-	/*¶ÔÊÇ·ñĞèÒª¹öÆÁÅĞ¶Ï*/
-	if (shell.cursor >= shell.size) {
-		scr_up();
-	}
-	if (ascii < 0x20)/*¶Ô¿ØÖÆ×Ö·ûµÄÅĞ¶Ï*/
-	{
-		return;
-	}
-	/*ÓÉÄ£ÄâÎÄ±¾Ä£Ê½²ÎÊıµ½Êµ¼ÊÍ¼ĞÎÄ£Ê½µÄ×ª»»*/
-	u32 x, y;
-	x = shell.x + (shell.cursor % shell.width) * 8;
-	y = shell.y + (shell.cursor / shell.width) * 16;
-	/*µ÷ÓÃÏÔÊ¾º¯Êı*/
-	draw_font(x, y, shell.color, ascii);
-	/*Ä£Äâ¹â±êÖ¸ÏòÏÂÒ»¸öµ¥Î»*/
-	shell.cursor ++;
-}
-
-put_string(u32 x, u32 y, u32 color, u8 *string)
-{
-	u32 point;
+	unsigned long point;
 	for (point = 0; string[point] != 0x00; point ++)
 	{
 		draw_font(x, y, color, string[point]);
@@ -175,11 +108,11 @@ put_string(u32 x, u32 y, u32 color, u8 *string)
 	}
 }
 
-/*ÏÔÊ¾×Ö*/
-void draw_font(u32 x, u32 y, u32 color, u8 ascii)
+/*æ˜¾ç¤ºå­—*/
+void draw_font(unsigned long x, unsigned long y, unsigned int color, unsigned char ascii)
 {
-	u32 p, i, font_offset;/*×Ö¿âÆ«ÒÆÁ¿*/
-	u8 d;
+	unsigned long p, i, font_offset;/*å­—åº“åç§»é‡*/
+	unsigned char d;
 	font_offset = ascii * 16;
 	for (i = 0; i < 16; i++)
 	{
@@ -195,15 +128,47 @@ void draw_font(u32 x, u32 y, u32 color, u8 ascii)
 	}
 }
 
-void draw_square(u32 x, u32 y, u32 width, u32 height, u32 color)
+void refresh_deta(void)
 {
-	u32 m, n;
-	for (n = 0; n != height; n ++)
-	{
-		for (m = 0; m != width; m ++)
-		{
-			put_pix_24(x + m, y + n, color);
-		}
-	}
+	/**23:30PM 10/18/2014æ ¼å¼*/
+	draw_square((shell.length - (18 * 8)), (shell.width - 16), (18 * 8), 16, 0x808080);
+	put_string((shell.length - (18 * 8)), (shell.width - 16), 0xffffff, "01:50AM 10/18/2014");
+	shell.refresh_deta_flag = false;
+	return;
 }
 
+void refresh_task_bar(void)
+{
+	draw_square(0, (shell.width - 16), (shell.length - (18 * 8)), 16, 0x000066);
+	shell.refresh_task_bar_flag = false;
+}
+
+void refresh_title(void)
+{
+	draw_square(0, 0, shell.length, 16, 0xff0000);
+	/**å¦‚æœæ ‡é¢˜æ˜¯ç©ºæŒ‡é’ˆï¼Œå°±æå‡ºè­¦å‘Šå¹¶è¿”å›*/
+	if ((*shell.map_window).title == NULL)
+	{
+		put_string(0, 0, 0xffff00, "No title!");
+		return;
+	}
+	put_string(0, 0, 0xffffff, (*shell.map_window).title);
+	shell.refresh_title_flag = false;
+	return;
+}
+
+void refresh_window(void)
+{
+	draw_square(0, 16, shell.length, (shell.width - (2 * 16)), (*shell.map_window).output_backdrop_color);
+	
+	put_string(0, 16, 0xffffff, (*shell.map_window).output);
+	shell.refresh_window_flag = false;
+}
+
+void refresh_shell(void)
+{
+	if (shell.refresh_title_flag == true) refresh_title();
+	if (shell.refresh_window_flag == true) refresh_window();
+	if (shell.refresh_task_bar_flag == true) refresh_task_bar();
+	if (shell.refresh_deta_flag == true) refresh_deta();
+}
