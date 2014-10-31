@@ -15,6 +15,7 @@
 
 void kernel_start(void)
 {
+    int k;
 	init_arch();
 	init_memory();
 	init_trap();
@@ -23,6 +24,10 @@ void kernel_start(void)
 	init_graph();
 	init_font();
 	init_shell();
+	f:
+	k=kmalloc(4);
+	printk("%X",k);
+	goto f;
 	//fin:goto fin;
 }
 
