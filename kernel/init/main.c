@@ -44,11 +44,10 @@ void main(void)
 
 void put_info(void)
 {
-	printk("%s %s\n", kernel_name, kernel_version);
-	printk("made by %s\n", author);
-	printk("%s\n", copyright);
-	printk("It is base on %s.\n", base);
-	printk("%s\n", description);
+	printk("%s %s - Based on %s.\n\n", kernel_name, kernel_version,base);
+	printk("(C)Copyright %s. All rights reserved.\n", copyright);
+	printk("Description: %s\n", description);
+	printk("\nCREDIT\n %s\n", author);
 }
 
 /*load copyright from COPR.TXT*/

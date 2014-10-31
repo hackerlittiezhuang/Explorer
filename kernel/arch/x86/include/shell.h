@@ -11,7 +11,8 @@
 #define SHELL
 
 #include "types.h"
-
+void cmos_info(void);
+void second(void);
 //×Ö¿â
 unsigned char *font;
 //ÆÁÄ»¿í¶È

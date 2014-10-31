@@ -10,11 +10,11 @@
 #ifndef INFO_H_
 #define INFO_H_
 
-	unsigned char kernel_name[] = "Explorer";
-	unsigned char kernel_version[] = "0.01 v14";
-	unsigned char author[] = "Rose<roselyu@163.com>,Hu wenjie(CN)<1@GhostBirdOS.org>";
-	unsigned char copyright[] = "Copyright 2013-2014 by Public Explorer Kernel Development Group.";
-	unsigned char base[] = "Public Explorer 0.0.1";
-	unsigned char description[] = "This version of the memory pool design, improve memory utilization, because the memory management restructuring, temporarily canceled into paging mode.";
+	static unsigned char kernel_name[] = "Explorer";
+	static char kernel_version[] = "v15";
+	static char author[] = "Hu wenjie(CN)<1@GhostBirdOS.org> \n Rose<roselyu@163.com>";
+	static char copyright[] = "2013-2014 Explorer Developers";
+	static char base[] = "Public Explorer";
+	static char description[] = "Current time and date viewing(by Rose).";
 
 #endif

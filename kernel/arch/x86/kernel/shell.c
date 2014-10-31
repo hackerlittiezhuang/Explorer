@@ -21,17 +21,50 @@ struct shell{
 	u32 size;
 	u32 color;
 }shell;
-
+struct CMOS
+   {
+      unsigned char current_second;
+      unsigned char alarm_second;
+      unsigned char current_minute;
+      unsigned char alarm_minute;
+      unsigned char current_hour;
+      unsigned char alarm_hour;
+      unsigned char current_day_of_week;
+      unsigned char current_day;
+      unsigned char current_month;
+      unsigned char current_year;
+      unsigned char status_registers[4];
+      unsigned char diagnostic_status;
+      unsigned char shutdown_code;
+      unsigned char drive_types;
+      unsigned char reserved_x;
+      unsigned char disk_1_type;
+      unsigned char reserved;
+      unsigned char equipment;
+      unsigned char lo_mem_base;
+      unsigned char hi_mem_base;
+      unsigned char hi_exp_base;
+      unsigned char lo_exp_base;
+      unsigned char fdisk_0_type;
+      unsigned char fdisk_1_type;
+      unsigned char reserved_2[19];
+      unsigned char hi_check_sum;
+      unsigned char lo_check_sum;
+      unsigned char lo_actual_exp;
+      unsigned char hi_actual_exp;
+      unsigned char century;
+      unsigned char information;
+      unsigned char reserved3[12];
+} cmos;
 
 //static struct shell_frame shell_frame;
 
 void init_shell(void)
 {
-	
-	/*¶¨Ê±*/
+	/*å®šæ—¶*/
 	//settimer(&refresh_shell, 100, 0);
 	font=get_font_addr("Standard Font");
-	/**³õÊ¼»¯¿ò¼Ü*/
+	/**åˆå§‹åŒ–æ¡†æ¶*/
 	/*shell_frame.length = xsize;
 	shell_frame.width = ysize;*/
 	/*initialize virtual text mode*/
@@ -42,8 +75,48 @@ void init_shell(void)
 	shell.cursor = 0;
 	shell.size = shell.width * shell.height;
 	shell.color = 0xffffffff;
+	cmos_info();
+	second();
 }
-
+void cmos_info(void)
+{
+	char i;
+	char *pointer;
+	char byte;
+	pointer = (char *) &cmos;
+	for (i = 0; i < 0x34; i++)
+	{
+		io_out8(0x70, i);
+		byte = io_in8(0x71);
+		*pointer++ = byte;
+	}
+	printk("  CMOS infomation.\n");
+	printk(" >> Current date: %X/%X/%X", cmos.current_month,
+		cmos.current_day, cmos.century);
+	if(cmos.current_year<10)
+	printk("0%X.\n",cmos.current_year);
+	else
+	printk("%X.\n",cmos.current_year);
+	printk(" >> System time: %X:%X:%X.\n", cmos.current_hour,
+		cmos.current_minute, cmos.current_second);
+	printk(" >> Shutdown type: %X.\n", cmos.shutdown_code);
+	printk(" >> Hard disk type %X\n", cmos.fdisk_0_type);
+}
+void second(void)
+{
+	char i;
+	char *pointer;
+	char byte;
+	pointer = (char *) &cmos;
+	for (i = 0; i < 0x34; i++)
+	{
+		io_out8(0x70, i);
+		byte = io_in8(0x71);
+		*pointer++ = byte;
+	}
+	printk(" >> Current time: %X:%X:%X.\n", cmos.current_hour,
+		cmos.current_minute, cmos.current_second);
+}
 int printk(const char *fmt, ...)
 {
 	/**
@@ -115,7 +188,7 @@ void debug(u32 *address, u32 size)
 	return;
 }
 
-/*ÏòÉÏ¹öÆÁ¹¦ÄÜº¯Êı*/
+/*å‘ä¸Šæ»šå±åŠŸèƒ½å‡½æ•°*/
 void scr_up(void)
 {
 	u32 x,y;
@@ -131,37 +204,37 @@ void scr_up(void)
 	return;
 }
 
-/*ÉèÖÃÑÕÉ«*/
+/*è®¾ç½®é¢œè‰²*/
 void color(u32 color)
 {
 	shell.color = color;
 }
 
-/*Êä³ö×Ö*/
+/*è¾“å‡ºå­—*/
 void put_font(u8 ascii)
 {
-	/*»»ĞĞ¼üµÄÅĞ¶Ï*/
+	/*æ¢è¡Œé”®çš„åˆ¤æ–­*/
 	if ((ascii == 0x0a))
 	{
 		shell.cursor -= (shell.cursor % shell.width);
 		shell.cursor += shell.width;
 	}
 
-	/*¶ÔÊÇ·ñĞèÒª¹öÆÁÅĞ¶Ï*/
+	/*å¯¹æ˜¯å¦éœ€è¦æ»šå±åˆ¤æ–­*/
 	if (shell.cursor >= shell.size) {
 		scr_up();
 	}
-	if (ascii < 0x20)/*¶Ô¿ØÖÆ×Ö·ûµÄÅĞ¶Ï*/
+	if (ascii < 0x20)/*å¯¹æ§åˆ¶å­—ç¬¦çš„åˆ¤æ–­*/
 	{
 		return;
 	}
-	/*ÓÉÄ£ÄâÎÄ±¾Ä£Ê½²ÎÊıµ½Êµ¼ÊÍ¼ĞÎÄ£Ê½µÄ×ª»»*/
+	/*ç”±æ¨¡æ‹Ÿæ–‡æœ¬æ¨¡å¼å‚æ•°åˆ°å®é™…å›¾å½¢æ¨¡å¼çš„è½¬æ¢*/
 	u32 x, y;
 	x = shell.x + (shell.cursor % shell.width) * 8;
 	y = shell.y + (shell.cursor / shell.width) * 16;
-	/*µ÷ÓÃÏÔÊ¾º¯Êı*/
+	/*è°ƒç”¨æ˜¾ç¤ºå‡½æ•°*/
 	draw_font(x, y, shell.color, ascii);
-	/*Ä£Äâ¹â±êÖ¸ÏòÏÂÒ»¸öµ¥Î»*/
+	/*æ¨¡æ‹Ÿå…‰æ ‡æŒ‡å‘ä¸‹ä¸€ä¸ªå•ä½*/
 	shell.cursor ++;
 }
 
@@ -175,10 +248,10 @@ put_string(u32 x, u32 y, u32 color, u8 *string)
 	}
 }
 
-/*ÏÔÊ¾×Ö*/
+/*æ˜¾ç¤ºå­—*/
 void draw_font(u32 x, u32 y, u32 color, u8 ascii)
 {
-	u32 p, i, font_offset;/*×Ö¿âÆ«ÒÆÁ¿*/
+	u32 p, i, font_offset;/*å­—åº“åç§»é‡*/
 	u8 d;
 	font_offset = ascii * 16;
 	for (i = 0; i < 16; i++)
@@ -206,4 +279,3 @@ void draw_square(u32 x, u32 y, u32 width, u32 height, u32 color)
 		}
 	}
 }
-
