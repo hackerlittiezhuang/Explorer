@@ -19,15 +19,18 @@
 #include <stdlib.h>
 
 int c;
+int t;
 /*main function of kernel*/
-void fa(void)
-{
-printk("look");
-}
+
 void main(void)
 {
 	/**display copyright and device etc information*/
 	put_info();
+	for(t=0;t<=10;t++)
+	{
+	  c=kmalloc(1);
+	  printk("\n>>kmalloc x%d: 0x%X", t, c);
+	}
 	/*²âÊÔC++º¯Êý*/
 	//test_C_plus_plus();
 	//init_hdd();
@@ -42,11 +45,12 @@ void main(void)
 void put_info(void)
 {
 	int p;
-	p=sizeof("                                            ");
+	p=printk("                                            ");
 	printk("\n%s %s - %s.\n\n", kernel_name, kernel_version,base);
 	printk("(C)Copyright %s. All rights reserved.\n", copyright);
 	printk("Description: %s\n", description);
 	printk("\nCREDIT\n %s\n", author);
+	output_CPU_info();
 	cmos_info();
 	settimer(&second,100,0);
 }
@@ -93,10 +97,6 @@ void cmos_info(void)
 
 void second(void)
 {
-outtextxy(c, c, 0xffff00, "hello here");
-c++;
-outtextxy(c, c, 0xffff00, "hello here");
-outtextxy(c, c, 0xffffff, "hello here");
 	//Real-time Second Refresh
 	char i;
 	char *pointer;
@@ -124,6 +124,7 @@ outtextxy(c, c, 0xffffff, "hello here");
 	else
 	 printk("%X",cmos.current_second);
 	printk(".\n");
+	
 }
 
 /*load copyright from COPR.TXT*/

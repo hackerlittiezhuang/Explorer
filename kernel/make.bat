@@ -1,18 +1,13 @@
 @echo off
-::::::::::::::::::::::::::::::::::::::
-::  构建程式 - Smilodon 助力
-::  简体中文版
-::  适配于 Explorer v14
+::  构建程式
+::  适配于 Explorer v15
 ::
 ::    ROSE编写 Rose<roselyu@163.com>
-::::::::::::::::::::::::::::::::::::::
-chcp 936
-::切换到简体中文编码页
-
+set comct=0
 if not exist tmp (md tmp)
 ::if not exist private (md private)
-set t=构建程式 0.2 中文版
-set n=v14系列适配
+set t=Public Make 0.3
+set n=v15
 goto main
 :done
 title %t% - 完成
@@ -38,29 +33,26 @@ goto done
 
 ::Main
 :main
+set /a comct=%comct%+1
 color 0f
-mode con cols=38 lines=30
 cls
 set command=
 set debug=
 title %t% - %n%
+echo 您当前是第%comct%次编译
     	echo 我们的网站 www.GhostBirdOS.org
-	echo --------------------------------------
 	echo.
-	echo +    Enter - 构建并启动虚拟机(调试)
-	echo +        1 - 构建并启动虚拟机(快速)
+	echo Enter	构建并启动虚拟机(调试)
+	echo 1	构建并启动虚拟机(无调试)
 	echo.
-	echo +        2 - 启动虚拟机
-	echo +        3 - 删除临时文件
-	echo +        4 - 发布
+	echo 2	启动虚拟机
+	echo 3	删除临时文件
+	echo 4	发布
 	ECHO.
-	echo +        5 - 关于和帮助
-	echo +        6 - 查看升级日志
+	echo 5	关于和帮助
+	echo 6	查看升级日志
 	echo.
-	echo +        0 - 退出
-	echo.
-	echo --------------------------------------
-	echo [   按下 ENTER 执行构建并启动虚拟机  ]
+	echo 0	退出
 	echo.
 set /p command="功能:"
 if "%command%"=="" goto all
@@ -98,7 +90,7 @@ exit
 cls
 mode con cols=80 lines=25
 title %t% - 正在编译...
-echo -------------------------------------->tmp\error.log
+echo ->tmp\error.log
 	taskkill /f /im virtualbox.exe >nul 2>nul
 	nasm loader\loader.asm -o tmp\loader.bin
 	nasm -f elf arch\x86\kernel\_start.asm -o tmp\_start.o
@@ -193,7 +185,6 @@ cls
 cls
 	echo %t% - %n%
 	echo 我们的网站 www.GhostBirdOS.org
-	echo --------------------------------------
 	echo.
         if exist about (type about) else (echo Document not found.)
 goto done
@@ -202,7 +193,6 @@ goto done
 cls
 	echo %t% - %n%
 	echo 我们的网站www.GhostBirdOS.org
-	echo --------------------------------------
 	echo.
 	if exist "updates.txt" (notepad "updates.txt"&goto done)
 goto done
