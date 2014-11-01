@@ -32,13 +32,51 @@ void main(void)
 	//
 	//init_syscalls();
 }
-
+void cmos_info(void)
+{
+	char i;
+	char *pointer;
+	char byte;
+	pointer = (char *) &cmos;
+	for (i = 0; i < 0x34; i++)
+	{
+		io_out8(0x70, i);
+		byte = io_in8(0x71);
+		*pointer++ = byte;
+	}
+	printk(" CMOS infomation:\n");
+	printk(" >> Date: %d/%d/%d", cmos.current_month,
+		cmos.current_day, cmos.century);
+	if(cmos.current_year<10)
+	printk("0%d.\n",cmos.current_year);
+	else
+	printk("%d.\n",cmos.current_year);
+	printk(" >> Time: %d:%d:%d.\n", cmos.current_hour,
+		cmos.current_minute, cmos.current_second);
+}
+void second(void)
+{
+	char i;
+	char *pointer;
+	char byte;
+	pointer = (char *) &cmos;
+	for (i = 0; i < 0x34; i++)
+	{
+		io_out8(0x70, i);
+		byte = io_in8(0x71);
+		*pointer++ = byte;
+	}
+	printk(" >> Current time: %d:%d:%d.\n", cmos.current_hour,
+		cmos.current_minute, cmos.current_second);
+}
 void put_info(void)
 {
 	printk("%s %s - Based on %s.\n\n", kernel_name, kernel_version,base);
 	printk("(C)Copyright %s. All rights reserved.\n", copyright);
 	printk("Description: %s\n", description);
 	printk("\nCREDIT\n %s\n", author);
+	cmos_info();
+	settimer(&second,1000,0);
 }
 
 /*load copyright from COPR.TXT*/

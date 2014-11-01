@@ -106,7 +106,7 @@ long int GUI_refresh_pix(struct layer_control *layer_control, long int x, long i
 	}
 	color = (red << 16) + (green << 8) + (blue);
 	(*layer_control).buffer[(y * (*layer_control).length) + x] = color;
-	put_pix_24(x, y, color);
+	putpixel(x, y, color);
 }
 
 /*refresh all the layer_control*/

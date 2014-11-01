@@ -134,6 +134,7 @@ echo -------------------------------------->tmp\error.log
 	call pcc.cmd -c GUI\window.c -o tmp\window.o -I "%cd%\include"
 	call pcc.cmd -c GUI\GUI.c -o tmp\GUI.o -I "%cd%\include"
 	call pcc.cmd -c lib\string.c -o tmp\string.o -I "%cd%\include"
+	call pcc.cmd -c lib\graphics.c -o tmp\graphics.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\shell.c -o tmp\shell.o -I "%cd%\include"
 	call p++.cmd -c C++\test.cpp -o tmp\test.o -I "%cd%\include"
 	::copy /y private\* tmp\*.o >nul 2>nul
@@ -149,7 +150,7 @@ echo -^> 链接目标文件...
 	tmp\task.o^
 	tmp\memory.o tmp\kmalloc.o tmp\do_page_fault.o tmp\fat32.o^
 	tmp\fun_asm.o tmp\fun_c.o tmp\trap.o tmp\trap_of_processor.o tmp\io.o^
-	tmp\syscalls.o tmp\do_syscalls.o^
+	tmp\syscalls.o tmp\do_syscalls.o tmp\graphics.o^
 	tmp\test.o tmp\string.o tmp\GUI.o tmp\window.o tmp\init.o 2>>tmp\error.log
 	echo.>>tmp\error.log
 	echo objcopy's error:>>tmp\error.log
