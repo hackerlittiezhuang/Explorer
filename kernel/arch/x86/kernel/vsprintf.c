@@ -1,7 +1,7 @@
 /**
  * Copyright 2013-2014 by Explorer Developer.
  * made by Hu wenjie(CN)<1@GhostBirdOS.org>
- * Explorer kernel shell head
+ * Explorer vsprintf
  * Explorer/arch/x86/kernel/vsprintf.c
  * version:Alpha
  * 10/25/2014 9:57 PM

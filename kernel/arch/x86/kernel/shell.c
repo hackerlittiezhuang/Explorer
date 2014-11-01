@@ -26,10 +26,12 @@ static struct shell_window *main_window;
 
 void init_shell(void)
 {
+	char testaddr;
 	/**获得字库信息*/
 	font = get_font_addr("Standard Font");
 	/**映射主窗口*/
 	shell.map_window = main_window;
+	
 	/**
 	 * 设定shell的大小，一般将跟窗口一样大。
 	 * 如果窗口比设计最大值还要大，就设置为设计最大值。
@@ -58,7 +60,7 @@ void init_shell(void)
 	shell.refresh_title_flag = true;
 	shell.refresh_window_flag = true;
 	shell.refresh_task_bar_flag = true;
-	shell.refresh_deta_flag = true;
+	shell.refresh_date_flag = true;
 	/**设置定时器，用于刷新界面*/
 	settimer(&refresh_shell, 100, 1);
 }
@@ -100,12 +102,12 @@ int printk(const char *fmt, ...)
 	return n;
 }
 
-void refresh_deta(void)
+void refresh_date(void)
 {
 	/**23:30PM 10/18/2014格式*/
 	rectangle((shell.length - (18 * 8)), (shell.width - 16), (18 * 8), 16, 0x808080);
 	outtextxy((shell.length - (18 * 8)), (shell.width - 16), 0xffffff, "01:50AM 10/18/2014");
-	shell.refresh_deta_flag = false;
+	shell.refresh_date_flag = false;
 	return;
 }
 
@@ -132,7 +134,7 @@ void refresh_title(void)
 void refresh_window(void)
 {
 	/**重绘背景*/
-	rectangle(0, 16, shell.length, (shell.width - (2 * 16)), (*shell.map_window).output_backdrop_color);
+	//rectangle(0, 16, shell.length, (shell.width - (2 * 16)), (*shell.map_window).output_backdrop_color);
 	/**重绘内容*/
 	unsigned long n;
 	unsigned char *output = (*shell.map_window).output;
@@ -164,5 +166,5 @@ void refresh_shell(void)
 	if (shell.refresh_title_flag == true) refresh_title();
 	if (shell.refresh_window_flag == true) refresh_window();
 	if (shell.refresh_task_bar_flag == true) refresh_task_bar();
-	if (shell.refresh_deta_flag == true) refresh_deta();
+	if (shell.refresh_date_flag == true) refresh_date();
 }

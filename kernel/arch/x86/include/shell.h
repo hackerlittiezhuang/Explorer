@@ -35,7 +35,7 @@
 struct shell_frame
 {
 	unsigned long length, width;
-	bool refresh_title_flag, refresh_window_flag, refresh_task_bar_flag, refresh_deta_flag;
+	bool refresh_title_flag, refresh_window_flag, refresh_task_bar_flag, refresh_date_flag;
 	struct shell_window *map_window;
 };
 
@@ -58,7 +58,7 @@ int printk(const char *fmt, ...);
 int vsprintf(char *buf, const char *fmt, va_list args);
 int sprintf(char *buf, const char *fmt, ...);
 
-void refresh_deta(void);
+void refresh_date(void);
 void refresh_task_bar(void);
 void refresh_title(void);
 void refresh_window(void);

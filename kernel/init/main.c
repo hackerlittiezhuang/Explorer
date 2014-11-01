@@ -16,8 +16,14 @@
 #include <arch.h>
 #include <keyboard.h>
 #include <kmalloc.h>
+#include <stdlib.h>
 
+int c;
 /*main function of kernel*/
+void fa(void)
+{
+printk("look");
+}
 void main(void)
 {
 	/**display copyright and device etc information*/
@@ -32,6 +38,19 @@ void main(void)
 	//
 	//init_syscalls();
 }
+
+void put_info(void)
+{
+	int p;
+	p=sizeof("                                            ");
+	printk("\n%s %s - %s.\n\n", kernel_name, kernel_version,base);
+	printk("(C)Copyright %s. All rights reserved.\n", copyright);
+	printk("Description: %s\n", description);
+	printk("\nCREDIT\n %s\n", author);
+	cmos_info();
+	settimer(&second,100,0);
+}
+
 void cmos_info(void)
 {
 	char i;
@@ -45,17 +64,40 @@ void cmos_info(void)
 		*pointer++ = byte;
 	}
 	printk(" CMOS infomation:\n");
-	printk(" >> Date: %d/%d/%d", cmos.current_month,
+	//date
+	printk(" >> Date: %X/%X/%X", cmos.current_month,
 		cmos.current_day, cmos.century);
 	if(cmos.current_year<10)
-	printk("0%d.\n",cmos.current_year);
+	 printk("0%X.\n",cmos.current_year);
 	else
-	printk("%d.\n",cmos.current_year);
-	printk(" >> Time: %d:%d:%d.\n", cmos.current_hour,
-		cmos.current_minute, cmos.current_second);
+	 printk("%X.\n",cmos.current_year);
+	
+	//time 00:00:00
+	printk(" >> Time: ");
+	if(cmos.current_hour<10)
+	 printk("0%X:",cmos.current_hour);
+	else
+	 printk("%X:",cmos.current_hour);
+	 
+	if(cmos.current_minute<10)
+	 printk("0%X:",cmos.current_minute);
+	else
+	 printk("%X:",cmos.current_minute);
+	
+	if(cmos.current_second<10)
+	 printk("0%X",cmos.current_second);
+	else
+	 printk("%X",cmos.current_second);
+	printk(".\n");
 }
+
 void second(void)
 {
+outtextxy(c, c, 0xffff00, "hello here");
+c++;
+outtextxy(c, c, 0xffff00, "hello here");
+outtextxy(c, c, 0xffffff, "hello here");
+	//Real-time Second Refresh
 	char i;
 	char *pointer;
 	char byte;
@@ -66,17 +108,22 @@ void second(void)
 		byte = io_in8(0x71);
 		*pointer++ = byte;
 	}
-	printk(" >> Current time: %d:%d:%d.\n", cmos.current_hour,
-		cmos.current_minute, cmos.current_second);
-}
-void put_info(void)
-{
-	printk("%s %s - Based on %s.\n\n", kernel_name, kernel_version,base);
-	printk("(C)Copyright %s. All rights reserved.\n", copyright);
-	printk("Description: %s\n", description);
-	printk("\nCREDIT\n %s\n", author);
-	cmos_info();
-	settimer(&second,1000,0);
+	printk(" >> Time: ");
+	if(cmos.current_hour<10)
+	 printk("0%X:",cmos.current_hour);
+	else
+	 printk("%X:",cmos.current_hour);
+	 
+	if(cmos.current_minute<10)
+	 printk("0%X:",cmos.current_minute);
+	else
+	 printk("%X:",cmos.current_minute);
+	
+	if(cmos.current_second<10)
+	 printk("0%X",cmos.current_second);
+	else
+	 printk("%X",cmos.current_second);
+	printk(".\n");
 }
 
 /*load copyright from COPR.TXT*/
