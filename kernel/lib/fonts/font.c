@@ -80,5 +80,5 @@ struct fontreg *get_font_info(unsigned char *name)
 			return &sysfont[i];
 		}
 	}
-	return &sysfont[0];
+	return NULL;
 }

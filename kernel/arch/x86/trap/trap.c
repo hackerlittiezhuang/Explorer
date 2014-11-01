@@ -16,7 +16,7 @@ void init_trap(void)
 {
 	IDT_len = 256;
 	IDT_size = IDT_len * 8;
-	IDT_addr = (u32 *) kmalloc(IDT_size);
+	IDT_addr = (u32 *) oldkmalloc(IDT_size);
 	write_IDTR((u32)IDT_addr, IDT_size - 1);
 	clean_IDT();
 	init_trap_of_processor();

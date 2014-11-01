@@ -2,7 +2,7 @@
  *Copyright 2013-2014 by Explorer Developer.
  *made by Hu wenjie(CN)<1@GhostBirdOS.org>,Linus Torvalds
  *Explorer C standard string
- *ExplorerOS/Kernel/lib/string.c
+ *ExplorerOS/Kernel/lib/string.h
  *version:Alpha
  *7/20/2014
  */
@@ -103,6 +103,20 @@ size_t strlen(const char *s)
 	const char *sc;
 
 	for (sc = s; *sc != '\0'; ++sc)
+		/* nothing */;
+	return sc - s;
+}
+
+/**
+ * strnlen - Find the length of a length-limited string
+ * @s: The string to be sized
+ * @count: The maximum number of bytes to search
+ */
+size_t strnlen(const char *s, size_t count)
+{
+	const char *sc;
+
+	for (sc = s; count-- && *sc != '\0'; ++sc)
 		/* nothing */;
 	return sc - s;
 }

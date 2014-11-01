@@ -1,82 +1,68 @@
 /**
  * Copyright 2013-2014 by Explorer Developer.
  * made by Hu wenjie(CN)<1@GhostBirdOS.org>
- * Explorer Old Kernel Shell
- * Explorer 0.01/shell/shell.c
+ * Explorer kernel Shell
+ * Explorer/arch/x86/kernel/shell.c
  * version:Alpha
  * 7/5/2014 7:08 PM
  */
- 
+
 #include "../include/shell.h"
+#include <arch.h>
+#include <lib/fonts/font.h>
 #include <stdarg.h>
+#include <stdbool.h>
+#include <stdlib.h>
 #include <types.h>
-#include <lib\fonts\font.h>
 
-struct shell{
-	u32 x;
-	u32 y;
-	u32 width;
-	u32 height;
-	u32 cursor;
-	u32 size;
-	u32 color;
-}shell;
-struct CMOS
-   {
-      unsigned char current_second;
-      unsigned char alarm_second;
-      unsigned char current_minute;
-      unsigned char alarm_minute;
-      unsigned char current_hour;
-      unsigned char alarm_hour;
-      unsigned char current_day_of_week;
-      unsigned char current_day;
-      unsigned char current_month;
-      unsigned char current_year;
-      unsigned char status_registers[4];
-      unsigned char diagnostic_status;
-      unsigned char shutdown_code;
-      unsigned char drive_types;
-      unsigned char reserved_x;
-      unsigned char disk_1_type;
-      unsigned char reserved;
-      unsigned char equipment;
-      unsigned char lo_mem_base;
-      unsigned char hi_mem_base;
-      unsigned char hi_exp_base;
-      unsigned char lo_exp_base;
-      unsigned char fdisk_0_type;
-      unsigned char fdisk_1_type;
-      unsigned char reserved_2[19];
-      unsigned char hi_check_sum;
-      unsigned char lo_check_sum;
-      unsigned char lo_actual_exp;
-      unsigned char hi_actual_exp;
-      unsigned char century;
-      unsigned char information;
-      unsigned char reserved3[12];
-} cmos;
+unsigned char *font;
 
-//static struct shell_frame shell_frame;
+/**格式化字符串缓冲区*/
+char string_buffer[SIZE_OF_STRBUFFER];
+
+static struct shell_frame shell;
+static struct shell_window main_window;
 
 void init_shell(void)
 {
-	/*定时*/
-	//settimer(&refresh_shell, 100, 0);
-	font=get_font_addr("Standard Font");
-	/**初始化框架*/
-	/*shell_frame.length = xsize;
-	shell_frame.width = ysize;*/
-	/*initialize virtual text mode*/
-	shell.width = xsize / 8;
-	shell.height = ysize / 16;
-	shell.x = (xsize - (shell.width * 8))/2;
-	shell.y = (ysize - (shell.height * 16))/2;
-	shell.cursor = 0;
-	shell.size = shell.width * shell.height;
-	shell.color = 0xffffffff;
+	/**获得字库信息*/
+	font = get_font_addr("Standard Font");
+	/**映射主窗口*/
+	shell.map_window = &main_window;
+	/**
+	 * 设定shell的大小，一般将跟窗口一样大。
+	 * 如果窗口比设计最大值还要大，就设置为设计最大值。
+	 */
+	if (xsize <= SHELL_MAX_LENGTH)
+	{
+		shell.length = xsize;
+	}else{
+		shell.length = SHELL_MAX_LENGTH;
+	}
+	if (ysize <= SHELL_MAX_WIDTH)
+	{
+		shell.width = ysize;
+	}else{
+		shell.width = SHELL_MAX_WIDTH;
+	}
+	/**主窗口的设定*/
+	main_window.title = "Hello,world!";
+	main_window.title_backdrop_color = 0xff0000;
+	main_window.output_font_color = 0xffffff;
+	main_window.output_backdrop_color = 0x333333;
+	main_window.write_point = 0;
+	main_window.map_top = 0;
+	main_window.map_bottom = 0;
+	/**准备好了后允许刷新*/
+	shell.refresh_title_flag = true;
+	shell.refresh_window_flag = true;
+	shell.refresh_task_bar_flag = true;
+	shell.refresh_deta_flag = true;
+	/**设置定时器，用于刷新界面*/
+	settimer(&refresh_shell, 1000, 1);
+	
 	cmos_info();
-	second();
+	settimer(&second,1000,0);
 }
 void cmos_info(void)
 {
@@ -90,17 +76,15 @@ void cmos_info(void)
 		byte = io_in8(0x71);
 		*pointer++ = byte;
 	}
-	printk("  CMOS infomation.\n");
-	printk(" >> Current date: %X/%X/%X", cmos.current_month,
+	printk(" CMOS infomation:\n");
+	printk(" >> Date: %d/%d/%d", cmos.current_month,
 		cmos.current_day, cmos.century);
 	if(cmos.current_year<10)
-	printk("0%X.\n",cmos.current_year);
+	printk("0%d.\n",cmos.current_year);
 	else
-	printk("%X.\n",cmos.current_year);
-	printk(" >> System time: %X:%X:%X.\n", cmos.current_hour,
+	printk("%d.\n",cmos.current_year);
+	printk(" >> Time: %d:%d:%d.\n", cmos.current_hour,
 		cmos.current_minute, cmos.current_second);
-	printk(" >> Shutdown type: %X.\n", cmos.shutdown_code);
-	printk(" >> Hard disk type %X\n", cmos.fdisk_0_type);
 }
 void second(void)
 {
@@ -114,133 +98,55 @@ void second(void)
 		byte = io_in8(0x71);
 		*pointer++ = byte;
 	}
-	printk(" >> Current time: %X:%X:%X.\n", cmos.current_hour,
+	printk(" >> Current time: %d:%d:%d.\n", cmos.current_hour,
 		cmos.current_minute, cmos.current_second);
 }
-int printk(const char *fmt, ...)
+void Write_to_output(struct shell_window *window, const char *buf)
 {
-	/**
-	 *variable parameter
-	 *va_list\va_start\va_arg\va_end all in Explorer/include
-	 */
-	
-	va_list arg_ptr;
-	va_start(arg_ptr, fmt);
-	char *ch1;
-	unsigned int int_val;
+	if (buf == NULL) return;
+	unsigned long point = (*window).write_point;
+	char *output = (*window).output;
 	do
 	{
-		if (*fmt == '%')
-		{
-			fmt++;
-			switch(*fmt)
-			{
-				case 'd':
-				break;
-				/*hex to string*/
-				case 'X':
-					int_val = va_arg(arg_ptr, unsigned int);
-					char shr;
-					for (shr = 28; shr >= 0; shr -= 4)
-					{
-						if ((((int_val) >> shr) & 0xf) <= 9)
-						{
-							put_font((((int_val) >> shr) & 0xf) + 0x30);
-						}else{
-							put_font((((int_val) >> shr) & 0xf) + 0x37);
-						}
-					}
-				break;
-				
-				/*output string*/
-				case 's':
-					ch1 = va_arg(arg_ptr, char *);
-					for (; *ch1 != 0x00; ch1++)
-					{
-						put_font(*ch1);
-					}
-				break;
-				/*output char "%"*/
-				case '%':
-					put_font('%');
-				break;
-				/*nothing*/
-				default:
-					put_font(*fmt);
-				break;
-			}
-		}else{
-			put_font(*fmt);
-		}
-	}while (*fmt++);
-	va_end(arg_ptr);
-}
-
-void debug(u32 *address, u32 size)
-{
-	printk("debug:from 0x%X to 0x%X is:\n", address, address+size);
-	for (; size > 0; size -= 4)
+		if (point == MAX_OUTPUT_SIZE) point = 0;
+		output[point] = *buf;
+		point ++;
+		buf ++;
+	}while (*buf != 0x00);
+	(*window).write_point = point;
+	(*window).map_bottom = point;
+	if (shell.map_window == window)
 	{
-		printk("%X ",*address);
-		address ++;
+		shell.refresh_window_flag = true;
 	}
-	printk("\n");
-	return;
 }
 
-/*向上滚屏功能函数*/
-void scr_up(void)
+int printk(const char *fmt, ...)
 {
-	u32 x,y;
-	for (y = shell.y; y < (shell.y + ((shell.height - 1) * 16)); y ++)
+	va_list arg;
+	int n;
+	va_start(arg, fmt);/*初始化参数指针*/
+	n = vsprintf(string_buffer, fmt, arg);/*格式化写入缓存并返回长度*/
+	Write_to_output(&main_window, string_buffer);
+	va_end(arg);/*处理指针，防止误操作*/
+	return n;
+}
+
+void draw_square(unsigned long x, unsigned long y, unsigned long height, unsigned long width, unsigned int color)
+{
+	unsigned long m, n;
+	for (n = 0; n != width; n ++)
 	{
-		for (x = shell.x; x < (shell.x + (shell.width * 8)); x ++)
+		for (m = 0; m != height; m ++)
 		{
-			put_pix_24(x, y, get_pix_24(x, (y + 16)));
-			put_pix_24(x, (y + 16), 0x00000000);
+			put_pix_24(x + m, y + n, color);
 		}
 	}
-	shell.cursor -= shell.width;
-	return;
 }
 
-/*设置颜色*/
-void color(u32 color)
+void put_string(unsigned long x, unsigned long y, unsigned int color, unsigned char *string)
 {
-	shell.color = color;
-}
-
-/*输出字*/
-void put_font(u8 ascii)
-{
-	/*换行键的判断*/
-	if ((ascii == 0x0a))
-	{
-		shell.cursor -= (shell.cursor % shell.width);
-		shell.cursor += shell.width;
-	}
-
-	/*对是否需要滚屏判断*/
-	if (shell.cursor >= shell.size) {
-		scr_up();
-	}
-	if (ascii < 0x20)/*对控制字符的判断*/
-	{
-		return;
-	}
-	/*由模拟文本模式参数到实际图形模式的转换*/
-	u32 x, y;
-	x = shell.x + (shell.cursor % shell.width) * 8;
-	y = shell.y + (shell.cursor / shell.width) * 16;
-	/*调用显示函数*/
-	draw_font(x, y, shell.color, ascii);
-	/*模拟光标指向下一个单位*/
-	shell.cursor ++;
-}
-
-put_string(u32 x, u32 y, u32 color, u8 *string)
-{
-	u32 point;
+	unsigned long point;
 	for (point = 0; string[point] != 0x00; point ++)
 	{
 		draw_font(x, y, color, string[point]);
@@ -249,10 +155,10 @@ put_string(u32 x, u32 y, u32 color, u8 *string)
 }
 
 /*显示字*/
-void draw_font(u32 x, u32 y, u32 color, u8 ascii)
+void draw_font(unsigned long x, unsigned long y, unsigned int color, unsigned char ascii)
 {
-	u32 p, i, font_offset;/*字库偏移量*/
-	u8 d;
+	unsigned long p, i, font_offset;/*字库偏移量*/
+	unsigned char d;
 	font_offset = ascii * 16;
 	for (i = 0; i < 16; i++)
 	{
@@ -268,14 +174,69 @@ void draw_font(u32 x, u32 y, u32 color, u8 ascii)
 	}
 }
 
-void draw_square(u32 x, u32 y, u32 width, u32 height, u32 color)
+void refresh_deta(void)
 {
-	u32 m, n;
-	for (n = 0; n != height; n ++)
+	/**23:30PM 10/18/2014格式 01:50AM 10/18/2014*/
+	draw_square((shell.length - (18 * 8)), (shell.width - 16), (18 * 8), 16, 0x808080);
+	put_string((shell.length - (18 * 8)), (shell.width - 16), 0xffffff, "01:50AM 11/01/2014");
+	shell.refresh_deta_flag = false;
+	return;
+}
+
+void refresh_task_bar(void)
+{
+	draw_square(0, (shell.width - 16), (shell.length - (18 * 8)), 16, 0x8080ff);
+	shell.refresh_task_bar_flag = false;
+}
+
+void refresh_title(void)
+{
+	draw_square(0, 0, shell.length, 16, (*shell.map_window).title_backdrop_color);
+	/**如果标题是空指针，就提出警告并返回*/
+	if ((*shell.map_window).title == NULL)
 	{
-		for (m = 0; m != width; m ++)
+		put_string(0, 0, 0xffff00, "No title");
+		return;
+	}
+	put_string(0, 0, 0xffffff, (*shell.map_window).title);
+	shell.refresh_title_flag = false;
+	return;
+}
+
+void refresh_window(void)
+{
+	/**重绘背景*/
+	draw_square(0, 16, shell.length, (shell.width - (2 * 16)), (*shell.map_window).output_backdrop_color);
+	/**重绘内容*/
+	unsigned long n;
+	unsigned char *output = (*shell.map_window).output;
+	unsigned int output_font_color = (*shell.map_window).output_font_color;
+	unsigned x = 0, y = 16;
+	for (n = (*shell.map_window).map_top; n < (*shell.map_window).map_bottom; n++)
+	{
+		if (output[n] == 0x00)
 		{
-			put_pix_24(x + m, y + n, color);
+		}else if (output[n] == 0x0a)
+		{
+			y += 16;
+			x = 0;
+		}else{
+			draw_font(x, y, output_font_color, output[n]);
+			x += 8;
+			if (x == shell.length)
+			{
+				y += 16;
+				x = 0;
+			}
 		}
 	}
+	shell.refresh_window_flag = false;
+}
+
+void refresh_shell(void)
+{
+	if (shell.refresh_title_flag == true) refresh_title();
+	if (shell.refresh_window_flag == true) refresh_window();
+	if (shell.refresh_task_bar_flag == true) refresh_task_bar();
+	if (shell.refresh_deta_flag == true) refresh_deta();
 }

@@ -3,7 +3,7 @@
  *made by Hu wenjie(CN)<1@GhostBirdOS.org>
  *Explorer 8254 head
  *Explorer 0.01/arch/x86/include/i8254.h
- *version:Alpha
+ *version:1.1
  *8/27/2014 12:31 PM
  */
 
@@ -24,13 +24,13 @@ struct timer_task
 	unsigned long long time;
 	unsigned char state;
 	void (*function)(void);
-	struct timer_task *next_task;
+	struct timer_task *prev_task, *next_task;
 };
 
 extern int_PIT;
 
 void init_PIT(void);
 void int_PIT_display(void);
-long settimer(void (*function)(void), unsigned long long time, unsigned char state);
+struct timer_task *settimer(void (*function)(void), unsigned long long time, unsigned char state);
 
 #endif

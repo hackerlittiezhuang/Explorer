@@ -10,7 +10,7 @@ chcp 936
 ::切换到简体中文编码页
 
 if not exist tmp (md tmp)
-if not exist private (md private)
+::if not exist private (md private)
 set t=构建程式 0.2 中文版
 set n=v14系列适配
 goto main
@@ -110,15 +110,16 @@ echo -------------------------------------->tmp\error.log
 	nasm -f elf drivers\dev_intr.asm -o tmp\dev_intr.o
 	nasm -f elf syscalls\do_syscalls.asm -o tmp\do_syscalls.o
 	call pcc.cmd -c arch\x86\kernel\kernel_start.c -o tmp\kernel_start.o -I "%cd%\include"
-	call pcc.cmd -c arch\x86\kernel\task.c -o tmp\task.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\i8254.c -o tmp\i8254.o -I "%cd%\include"
 	call pcc.cmd -c init\main.c -o tmp\main.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\shell.c -o tmp\shell.o -I "%cd%\include"
+	call pcc.cmd -c arch\x86\kernel\vsprintf.c -o tmp\vsprintf.o -I "%cd%\include"
 	call pcc.cmd -c lib\fonts\font.c -o tmp\font.o -I "%cd%\include"
-	call pcc.cmd -c lib\fonts\standard_font.c -o tmp\standard_font.o -I "%cd%\include"
 	call pcc.cmd -c lib\fonts\simsun.c -o tmp\simsun.o -I "%cd%\include"
+	call pcc.cmd -c lib\fonts\standard_font.c -o tmp\standard_font.o -I "%cd%\include"
 	call pcc.cmd -c lib\fonts\linux_sun.c -o tmp\linux_sun.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\memory.c -o tmp\memory.o -I "%cd%\include"
+	call pcc.cmd -c arch\x86\kernel\task.c -o tmp\task.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\kmalloc.c -o tmp\kmalloc.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\do_page_fault.c -o tmp\do_page_fault.o -I "%cd%\include"
 	call pcc.cmd -c drivers\hdd.c -o tmp\hdd.o -I "%cd%\include"
@@ -135,13 +136,14 @@ echo -------------------------------------->tmp\error.log
 	call pcc.cmd -c lib\string.c -o tmp\string.o -I "%cd%\include"
 	call pcc.cmd -c arch\x86\kernel\shell.c -o tmp\shell.o -I "%cd%\include"
 	call p++.cmd -c C++\test.cpp -o tmp\test.o -I "%cd%\include"
-	copy /y private\* tmp\*.o >nul 2>nul
+	::copy /y private\* tmp\*.o >nul 2>nul
 cls
 echo -^> 链接目标文件...
 	::Link
 	ld -o tmp\kernel.o	-Ttext 0x11000^
 	tmp\_start.o tmp\kernel_start.o tmp\main.o^
-	tmp\shell.o tmp\font.o tmp\standard_font.o tmp\simsun.o tmp\linux_sun.o^
+	tmp\shell.o tmp\vsprintf.o^
+	tmp\font.o tmp\simsun.o tmp\standard_font.o tmp\linux_sun.o^
 	tmp\hdd.o tmp\video.o tmp\mouse.o tmp\keyboard.o tmp\i8254.o tmp\i8254_asm.o tmp\dev_intr.o^
 	tmp\i8259.o^
 	tmp\task.o^

@@ -15,6 +15,6 @@
 	static char author[] = "Hu wenjie(CN)<1@GhostBirdOS.org> \n Rose<roselyu@163.com>";
 	static char copyright[] = "2013-2014 Explorer Developers";
 	static char base[] = "Public Explorer";
-	static char description[] = "Current time and date viewing(by Rose).";
+	static char description[] = "New Shell and current time viewing.";
 
 #endif

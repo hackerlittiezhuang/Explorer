@@ -3,7 +3,7 @@
  * made by Hu wenjie(CN)<1@GhostBirdOS.org>
  * Explorer intel 8254 support
  * Explorer 0.01/arch/x86/include/i8259.h
- * version:1.0
+ * version:1.2
  * 7/26/2014 5:26 PM
  */
 
@@ -58,8 +58,15 @@ void init_PIT(void)
 void int_PIT_display(void)
 {
 	sys_clock++;/*维护系统时间开销*/
+	
+	/**判断此时是否有任务链表*/
+	if (current_task == NULL) return;
+	
+	/**执行定时任务*/
 	struct timer_task *task_point;
 	task_point = current_task;
+	
+	/**循环判断是否有任务到时需要执行*/
 	while((task_point != NULL) && ((*task_point).time == sys_clock))
 	{
 		(*(*task_point).function)();
@@ -71,10 +78,8 @@ void int_PIT_display(void)
 		oldkfree(task_point);
 		task_point = (*task_point).next_task;
 	}
-/*EOI，允许8259A继续接收中断*/
-EOI:
-	io_out8(0x20, 0x20);
-	io_out8(0xA0, 0x20);
+	/**EOI，允许8259A继续接收中断*/
+	EOI();
 }
 
 /**
@@ -84,27 +89,46 @@ EOI:
  * 如果是定时执行多次，就会在time微秒后执行该函数，而且该函数每隔time微妙后会再次执行
  * state为定时属性，有0（定时执行多次）和其它值（定时只执行一次）
  */
-long settimer(void (*function)(void), unsigned long long time, unsigned char state)
+struct timer_task *settimer(void (*function)(void), unsigned long long time, unsigned char state)
 {
 	/*argument check*/
-	if (time == 0) return -1;
+	if (time == 0) return NULL;
 	
 	struct timer_task *new_task, *task_point;
 	task_point = current_task;
+	
+	/*创建新的定时任务结构体*/
 	new_task = (struct timer_task *) oldkmalloc(sizeof(struct timer_task));
+	if (new_task == NULL) return NULL;/*如果内存分配返回空值，就意味着没有分配成功*/
+	/*给新的定时任务结构体赋相应的值*/
 	(*new_task).time_size = time;
 	(*new_task).time = sys_clock + time;
 	(*new_task).state = state;
 	(*new_task).function = function;
-	if (current_task == NULL)
+	
+	/*将新的定时任务结构体插入任务结构体链表中*/
+	if (current_task == NULL)/*当前任务是空指针时，代表没有定时任务链表*/
 	{
 		current_task = new_task;
-		return 0;
-	}else{
+		(*new_task).prev_task = NULL;
+		(*new_task).next_task = NULL;
+		
+	}else{/*当前任务是非空指针时，有定时任务链表*/
+		/**
+		 * 循环找到合适插入链表中的位置
+		 * 这个链表被设计成按定时触发时间长短排序的，
+		 * 从链表中的第一个表项到最后一个表项所触发的时间是依次上升的
+		 */
 		while(((*task_point).time < (*new_task).time) && (*task_point).next_task != NULL)
 		{
 			task_point = (*task_point).next_task;
 		}
+		
+		/*找到了合适的位置，定时任务链表是双向的，进行双向赋值*/
+		(*new_task).next_task = (*task_point).next_task;
+		(*new_task).prev_task = task_point;
 		(*task_point).next_task = new_task;
+		(*(*new_task).next_task).prev_task = new_task;
 	}
+	return new_task;
 }

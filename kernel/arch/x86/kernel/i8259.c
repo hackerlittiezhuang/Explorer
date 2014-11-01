@@ -78,3 +78,9 @@ int32 register_PIC(u8 IRQ, void *function, u8 *info)
 	creat_IDT(PIC0_intr_offset + IRQ, code_0_selector, function, interrupt_gate + IDT_32 + IDT_DPL_0 + IDT_P);
 	open_PIC(IRQ);
 }
+
+void EOI(void)
+{
+	io_out8(0x20, 0x20);
+	io_out8(0xA0, 0x20);
+}

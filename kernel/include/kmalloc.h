@@ -77,7 +77,8 @@ struct mem_pool
 };
 
 /**private function needn't use "extern "C{}"*/
-static unsigned long alloc_128KB_to_64KB(void *point);
+static unsigned long alloc_128KB_to_64KB(void);
+static unsigned long alloc_mem_to_128KB(void);
 
 /**
  * use "extern "C{}"

@@ -15,22 +15,13 @@
 #include <info.h>
 #include <arch.h>
 #include <keyboard.h>
-
-void xxx(void)
-{
-	printk("look!");
-}
+#include <kmalloc.h>
 
 /*main function of kernel*/
 void main(void)
 {
-	/*显示版权、设备等信息*/
-	/**
-	 * display copyright and device etc information
-	 */
+	/**display copyright and device etc information*/
 	put_info();
-	//settimer(&xxx, 200, 0);
-
 	/*测试C++函数*/
 	//test_C_plus_plus();
 	//init_hdd();

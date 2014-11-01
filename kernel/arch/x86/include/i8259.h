@@ -31,5 +31,6 @@
 void init_PIC(void);
 int32 open_PIC(u8 IRQ);
 int32 register_PIC(u8 IRQ, void *function, u8 *info);
+void EOI(void);
 
 #endif

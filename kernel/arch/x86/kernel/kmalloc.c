@@ -49,75 +49,35 @@ void init_kmalloc(void)
 
 void *kmalloc(size_t size)
 {
-	/*compare argument if it want to allocate more than 128KB*/
-	if (size > (128*1024)) return NULL;
-	
 	unsigned long n;
-	void *point;
-	/*if (size <= 16)
+	void *retval;
+
+	/**对传入的参数数值进行判断，kmalloc只实现对1B~128KB的内存分配*/
+	if (size > (128 * 1024)) return NULL;
+	
+	if (size <= (64 * 1024))
 	{
-		for (n = 0; n < NUMBER_OF_16B; n ++)
-		{
-			if ()
-		}
-	}*/
-	/**暂时只分配128KB和64KB内存*/
-	//if (size <= (64 * 128))
-	if (size <= 0)
-	{
-		/**如果没有足够的内存，先准备*/
+	
+		/**检查是否有内存供分配，如果没有则返回空指针*/
 		if (mem_pool.available_64KB == 0)
 		{
-			/**如果没有可分配的64KB内存却内存池已经满，则拒绝分配*/
-			if (mem_pool.num_64KB > (NUMBER_OF_64KB - 2)) return NULL;
-			point = kmalloc(128 * 1024);
-			/*这里需要判断内存是否存在128KB分配失败*/
-			if (point == NULL) return NULL;
-			alloc_128KB_to_64KB(point);
+			if (alloc_128KB_to_64KB() == 0) return NULL;
 		}
-		/**到这里意味着有了足够的内存，可以分配*/
-		for (n = 0; n < NUMBER_OF_64KB; n ++)
+		
+		/**有64KB内存供分配*/
+		for (n = 0; n < NUMBER_OF_64KB; n++)
 		{
 			if (mem_pool.mem_64KB[n].attr == AVAILABLE_TABLE)
 			{
+				retval = mem_pool.mem_64KB[n].base;
 				mem_pool.mem_64KB[n].attr = USED_TABLE;
 				mem_pool.available_64KB --;
-				return mem_pool.mem_64KB[n].base;
-			}
-		}
-	
-	
-	/*128KB分配*/
-	}else{
-		/**如果没有足够的内存，先准备*/
-		if (mem_pool.available_128KB == 0)/*如果没有*/
-		{
-			/**如果没有可分配的128KB内存却内存池已经满，则拒绝分配*/
-			if (mem_pool.num_128KB == NUMBER_OF_128KB) return NULL;
-			/**如果没有可分配的128KB内存但内存池有空间，则申请页来作为新的空间*/
-			for (n = 0; n < NUMBER_OF_128KB; n ++)
-			{
-				if (mem_pool.mem_128KB[n].attr == EMPTY_TABLE)
-				{
-					mem_pool.mem_128KB[n].base = (void *) oldkmalloc(128 * 1024);
-					mem_pool.mem_128KB[n].attr = AVAILABLE_TABLE;
-					mem_pool.num_128KB ++;
-					mem_pool.available_128KB ++;
-				}
-			}
-		}
-		/*如果到这里，一定有128KB的未分配内存*/
-			for (n = 0; n < NUMBER_OF_128KB; n ++)
-			{
-				if (mem_pool.mem_128KB[n].attr == AVAILABLE_TABLE)
-				{
-					mem_pool.available_128KB --;
-					mem_pool.mem_128KB[n].attr = USED_TABLE;
-					return mem_pool.mem_128KB[n].base;
-				}
+				return retval;
 			}
 		}
 	}
+	
+}
 
 void kfree(void *point)
 {
@@ -144,33 +104,74 @@ void kfree(void *point)
 	return;
 }
 
-static unsigned long alloc_128KB_to_64KB(void *point)
+static unsigned long alloc_128KB_to_64KB(void)
 {
-	/**如果没有可分配的64KB内存却内存池已经满，则拒绝分配*/
-	if (mem_pool.num_64KB > (NUMBER_OF_64KB - 2)) return -1;
-	/**如果没有可分配的64KB内存但内存池有空间，
-	 * 则申请128KB来作为新的空间
-	 * 将128KB分割成两个64KB加入64KB内存池中
-	 */
 	unsigned long n;
-	for (n = 0; n < NUMBER_OF_64KB; n ++)
+	void *point;
+	
+	/*如果64KB内存池中无空表，就不能向64KB内存池中加入新内存*/
+	if (mem_pool.num_64KB == NUMBER_OF_64KB) return 0;
+	
+	/*检查128KB内存池中有无正好可以分配的内存*/
+	if (mem_pool.available_128KB == 0)
+	{
+		if (alloc_mem_to_128KB() == 0) return 0;/*无可分配的内存，就向128KB内存池中加入新内存*/
+	}
+	
+	/*在128KB内存池中查找可用内存*/
+	for (n = 0; n < NUMBER_OF_128KB; n++)
+	{
+		if (mem_pool.mem_128KB[n].attr == AVAILABLE_TABLE)
+		{
+			point = mem_pool.mem_128KB[n].base;
+			mem_pool.mem_128KB[n].attr = EMPTY_TABLE;/*该表项空*/
+			mem_pool.available_128KB --;
+			mem_pool.num_128KB --;
+			break;
+		}
+	}
+	
+	for (n = 0; n < NUMBER_OF_64KB; n++)
 	{
 		if (mem_pool.mem_64KB[n].attr == EMPTY_TABLE)
 		{
 			mem_pool.mem_64KB[n].base = point;
 			mem_pool.mem_64KB[n].attr = AVAILABLE_TABLE;
+			break;
 		}
 	}
-	for (n = 0; n < NUMBER_OF_64KB; n ++)
+	
+	for (; n < NUMBER_OF_64KB; n++)
 	{
 		if (mem_pool.mem_64KB[n].attr == EMPTY_TABLE)
 		{
-			mem_pool.mem_64KB[n].base = point + (64 * 1024);
+			mem_pool.mem_64KB[n].base = (point + 65536);
 			mem_pool.mem_64KB[n].attr = AVAILABLE_TABLE;
+			break;
 		}
 	}
-	/**修改内存池信息*/
-	mem_pool.num_64KB += 2;
 	mem_pool.available_64KB += 2;
-	return 0;
+	mem_pool.num_64KB += 2;
+	return 2;
+}
+
+static unsigned long alloc_mem_to_128KB(void)
+{
+	/*如果128KB内存池不能容纳更多的内存，就返回0（分配0个）*/
+	if (mem_pool.num_128KB == NUMBER_OF_128KB) return 0;
+	void *point;
+	point = (void *)oldkmalloc((128 * 1024));
+	unsigned long n;
+	for (n = 0; n < NUMBER_OF_128KB; n++)
+	{
+		if (mem_pool.mem_128KB[n].attr == EMPTY_TABLE)
+		{
+			mem_pool.mem_128KB[n].base = point;
+			mem_pool.mem_128KB[n].attr = AVAILABLE_TABLE;
+			mem_pool.available_128KB ++;
+			mem_pool.num_128KB ++;
+			break;
+		}
+	}
+	return 1;
 }
