@@ -1,4 +1,8 @@
-10/11/2014		Explorer 在github安家
+2/11/2014		Explorer支持启动elf APP
+				忘记说的updates： :P
+				shell更新
+				增加字库控制器 可以管理在内核中的字库
+11/10/2014		Explorer 在github安家
 10/3/2014		完成了大体内存池结构的设计，在arch/x86/kernel/kmalloc.c中，里面有详细的注视
 
 9/20/2014		今天用C语言做了printk函数，在shell.c中。版权信息从rose那里继承来，得到改善。

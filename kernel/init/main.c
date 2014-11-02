@@ -16,30 +16,27 @@
 #include <arch.h>
 #include <keyboard.h>
 #include <kmalloc.h>
-#include <stdlib.h>
 
-int c;
-int t;
 /*main function of kernel*/
-
 void main(void)
 {
 	/**display copyright and device etc information*/
 	put_info();
-	for(t=0;t<=10;t++)
-	{
-	  c=kmalloc(1);
-	  printk("\n>>kmalloc x%d: 0x%X", t, c);
-	}
 	/*测试C++函数*/
 	//test_C_plus_plus();
-	//init_hdd();
-	//init_FAT32();
+	init_hdd();
+	init_FAT32();
 	/*加载文件*/
-	//load_BACKDROP_PIC();
 	//load_COPR();
+	load_BACKDROP_PIC();
+	test();
 	//
 	//init_syscalls();
+}
+
+void test(void)
+{
+
 }
 
 void put_info(void)
@@ -53,6 +50,43 @@ void put_info(void)
 	output_CPU_info();
 	cmos_info();
 	settimer(&second,100,0);
+}
+
+/*load copyright from COPR.TXT*/
+void load_COPR(void)
+{/*
+	u32 COPR_buffer;
+	file_info COPR_info;
+	COPR_buffer = (u32) kmalloc(COPR_info.size);
+	file_open("EXPLORER.ELF", COPR_buffer);
+	printk(COPR_buffer);
+	oldkfree(COPR_buffer, COPR_info.size);
+*/
+	u32 ELF_buffer;
+	file_info ELF_info;
+	void (*sb)(void);
+	
+	//Code Begin
+	sb=kmalloc(ELF_info.size); //Get the address
+	ELF_buffer = (u32) *sb; //Convert to u32
+	file_open("EXPLORER.ELF", ELF_buffer); //Load ELF to memory
+	printk(ELF_buffer);
+	sb = sb + 0x32;
+	printk(sb);
+	(*sb)();
+	oldkfree(ELF_buffer, ELF_info.size);
+	printk("sb");
+	outtextxy(200, 500, 0xffffff, "sbsbsbAHs0/18/2014");
+}
+
+/*load picture*/
+void load_BACKDROP_PIC(void)
+{
+	char *pic_buffer;
+	pic_buffer = oldkmalloc(800*600*3);
+	/*试加载BACKDROP.PIC*/
+	file_open("BACKDROP.PIC", (u32)vram);//BACKDROP_PIC_point
+	//refresh_scr((unsigned char *) pic_buffer);
 }
 
 void cmos_info(void)
@@ -125,35 +159,4 @@ void second(void)
 	 printk("%X",cmos.current_second);
 	printk(".\n");
 	
-}
-
-/*load copyright from COPR.TXT*/
-void load_COPR(void)
-{
-	u32 COPR_buffer;
-	file_info COPR_info;
-	COPR_buffer = (u32) kmalloc(COPR_info.size);
-	file_open("COPR.TXT", COPR_buffer);
-	printk(COPR_buffer);
-	oldkfree(COPR_buffer, COPR_info.size);
-}
-
-/*load picture*/
-void load_BACKDROP_PIC(void)
-{
-	/*initialization picture layer*/
-	struct struct_layer *picture_layer;
-	picture_layer = GUI_layer_alloc(&layer_root);
-	(*picture_layer).visiable = true;
-	GUI_set_position(picture_layer, 0, 0);
-	
-	/*notice:There are use immediately number to the function,
-	 *They will be affect support in different VGA mode
-	 */
-	
-	GUI_set_resolution(picture_layer, 800, 600);
-	/*试加载BACKDROP.PIC*/
-	file_open("BACKDROP.PIC", (u32) (*picture_layer).buf);//BACKDROP_PIC_point
-	GUI_refresh(&layer_root);
-	refresh_scr((unsigned char *) layer_root.buffer);
 }

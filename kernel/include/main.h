@@ -10,8 +10,6 @@
 #define MAIN_H_
 
 //void kernel_start(void);
-void cmos_info(void);
-void second(void);
 struct CMOS
    {
       unsigned char current_second;
@@ -52,5 +50,7 @@ void test(void);
 void load_COPR(void);
 void load_BACKDROP_PIC(void);
 void put_info(void);
-
+void cmos_info(void);
+void second(void);
+void test(void);
 #endif

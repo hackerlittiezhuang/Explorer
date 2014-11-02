@@ -34,6 +34,7 @@
  */
 struct shell_frame
 {
+	unsigned long max_x, max_y;
 	unsigned long length, width;
 	bool refresh_title_flag, refresh_window_flag, refresh_task_bar_flag, refresh_date_flag;
 	struct shell_window *map_window;
@@ -46,6 +47,7 @@ struct shell_window
 	unsigned int title_backdrop_color;
 	unsigned int output_backdrop_color;
 	unsigned int output_font_color;
+	unsigned long times;
 	unsigned long write_point, map_top, map_bottom;
 };
 
@@ -54,9 +56,13 @@ extern u32 xsize;
 extern u32 ysize;
 
 void inti_shell(void);
+void print_mem(unsigned int *point, size_t size);
 int printk(const char *fmt, ...);
 int vsprintf(char *buf, const char *fmt, va_list args);
 int sprintf(char *buf, const char *fmt, ...);
+
+unsigned long Jump_line(struct shell_window *window, unsigned long point, long jmp_line);
+void Write_to_output(struct shell_window *window, const char *buf);
 
 void refresh_date(void);
 void refresh_task_bar(void);

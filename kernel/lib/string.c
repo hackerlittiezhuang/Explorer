@@ -1,10 +1,10 @@
-/*
- *Copyright 2013-2014 by Explorer Developer.
- *made by Hu wenjie(CN)<1@GhostBirdOS.org>,Linus Torvalds
- *Explorer C standard string
- *ExplorerOS/Kernel/lib/string.h
- *version:Alpha
- *7/20/2014
+/**
+ * Copyright 2013-2014 by Explorer Developer.
+ * made by Hu wenjie(CN)<1@GhostBirdOS.org>,Linus Torvalds
+ * Explorer C standard string
+ * Explorer/lib/string.c
+ * version:Alpha
+ * 7/20/2014
  */
 
 #include <lib/string.h>

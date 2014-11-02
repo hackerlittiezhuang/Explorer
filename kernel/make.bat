@@ -6,7 +6,7 @@
 set comct=0
 if not exist tmp (md tmp)
 ::if not exist private (md private)
-set t=Public Make 0.3
+set t=Make 0.3 (Classic Style)
 set n=v15
 goto main
 :done
@@ -54,6 +54,7 @@ echo 您当前是第%comct%次编译
 	echo.
 	echo 0	退出
 	echo.
+echo ** 由于Public Compiler Shell的推出，使用调试模式的时候编译次数会被重置。
 set /p command="功能:"
 if "%command%"=="" goto all
 if "%command%"=="1" goto debug
@@ -88,7 +89,6 @@ svnshell.cmd coci
 exit
 :Compile
 cls
-mode con cols=80 lines=25
 title %t% - 正在编译...
 echo ->tmp\error.log
 	taskkill /f /im virtualbox.exe >nul 2>nul

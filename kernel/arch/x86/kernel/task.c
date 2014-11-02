@@ -93,11 +93,9 @@ void switch_task(void)
 		/**寻找到一个非空的任务结构体时，进行切换*/
 		if (task[n].attr != EMPTY)
 		{
-		/*
-			void *stack;
-			asm volatile("movl	%esp,(stack);");
-			task[n].stack = stack;
-		*/
+			//void *stack;
+			//asm volatile("movl	%esp,(stack);");
+			//task[n].stack = stack;
 		}
 	}
 }

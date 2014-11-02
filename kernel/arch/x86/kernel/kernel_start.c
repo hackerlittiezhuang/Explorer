@@ -179,8 +179,8 @@ void output_CPU_info(void)
                       );
             printk("%s", (char *)brands);
         }
-/*printk("\n\n");
-	printk("CPU's manufacturer ID:%s\n", &CPU_OEM);
-	printk("CPUID support in MAX:0x%X,extended CPUID support in MAX:0x%X.\n", CPU_MAXID, CPU_EMAXID);
-	printk("CPU family:%s[0x%X],model:%s[0x%X].\n", CPU_family,display_family, CPU_model, display_model);*/
+printk("\n\n");
+	//printk("CPU's manufacturer ID:%s\n", &CPU_OEM);
+	//printk("CPUID support in MAX:0x%X,extended CPUID support in MAX:0x%X.\n", CPU_MAXID, CPU_EMAXID);
+	//printk("CPU family:%s[0x%X],model:%s[0x%X].\n", CPU_family,display_family, CPU_model, display_model);
 }
