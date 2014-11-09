@@ -7,23 +7,18 @@
  */
 #include <stddef.h>
 #include <lib/string.h>
-#ifdef __cplusplus  
-	extern "C"
-	{
 		void printk(const char* format, ...);
 		void _start(void);
-	}
-#endif  
-
 void _start(void)
 {
 //White Screen Demo by Rose
-	int *p;
+	/*int *p;
 	int position_now;
 	for (position_now=0;position_now<=800*600*3;position_now++)
 	{
 		p = position_now + 0xe0000000;
 		*p = 0xff;
-	}
+	}*/
+	printk("shabia ");
 	return;
 }

@@ -1,19 +1,19 @@
 @echo off
-::Public C++ Compiler
+::Powerful C++ Compiler
 if "%debug%"=="y" goto main
 goto quick
 :error
 cls
-title %t% - 编译失败
+title %t% - Powerful C++ Compiler
 	color 0c
 cls
-	echo ** 抱歉 代码出错
+	echo ** 抱歉 编译出错
 	echo.
-	echo 错误详情:
+	echo 错误详情:（按任意键向下）
 	type tmp\error.log|more
 	echo [按任意键返回]
 pause>nul
-start make.bat
+start make.bat %comct%
 exit
 :quick
 title %t% - %2(快速)

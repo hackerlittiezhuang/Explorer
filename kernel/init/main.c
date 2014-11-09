@@ -28,15 +28,28 @@ void main(void)
 	init_FAT32();
 	/*╪стьнд╪Ч*/
 	//load_COPR();
-	load_BACKDROP_PIC();
-	test();
+	//load_BACKDROP_PIC();
+	load_ELF();
+	printk("\nCREDIT\n %s\n", author);
 	//
 	//init_syscalls();
 }
 
-void test(void)
+void load_ELF(void)
 {
-
+	u32 ELF_buffer;
+	file_info ELF_info;
+	void (*sb)(void);
+	
+	//Code Begin
+	sb=kmalloc(ELF_info.size); //Get the address
+	//ELF_buffer = (u32) *sb; //Convert to u32
+	file_open("EXPLORER.ELF", sb); //Load ELF to memory
+	sb = sb + 0x32;
+	(*sb)();
+	//oldkfree(ELF_buffer, ELF_info.size);
+	printk("sb");
+	outtextxy(200, 500, 0xffffff, "sbsbsbAHs0/18/2014");
 }
 
 void put_info(void)
@@ -49,34 +62,17 @@ void put_info(void)
 	printk("\nCREDIT\n %s\n", author);
 	output_CPU_info();
 	cmos_info();
-	settimer(&second,100,0);
 }
 
 /*load copyright from COPR.TXT*/
 void load_COPR(void)
-{/*
+{
 	u32 COPR_buffer;
 	file_info COPR_info;
 	COPR_buffer = (u32) kmalloc(COPR_info.size);
 	file_open("EXPLORER.ELF", COPR_buffer);
 	printk(COPR_buffer);
 	oldkfree(COPR_buffer, COPR_info.size);
-*/
-	u32 ELF_buffer;
-	file_info ELF_info;
-	void (*sb)(void);
-	
-	//Code Begin
-	sb=kmalloc(ELF_info.size); //Get the address
-	ELF_buffer = (u32) *sb; //Convert to u32
-	file_open("EXPLORER.ELF", ELF_buffer); //Load ELF to memory
-	printk(ELF_buffer);
-	sb = sb + 0x32;
-	printk(sb);
-	(*sb)();
-	oldkfree(ELF_buffer, ELF_info.size);
-	printk("sb");
-	outtextxy(200, 500, 0xffffff, "sbsbsbAHs0/18/2014");
 }
 
 /*load picture*/

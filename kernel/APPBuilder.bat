@@ -1,11 +1,11 @@
 @echo off
-set t=APP Builder
+set t=Ghostbird APP Builder
 color f0
 title %t% - Welcome
 echo Ghostbird ELF 应用编译器
 echo.
 echo 这是一个跨世纪的新改变。
-echo 按任意键开始。
+echo 按任意键开始编译测试应用 first.c。
 pause>nul
 :main
 title %t% - Compiling...
@@ -15,8 +15,8 @@ cls
 	echo ** 启动虚拟机
 echo.
 echo ***********正在编译，请耐心等待......
-gcc -c -fpermissive apps\first.c -o EXPLORER.ELF -I "%cd%\include"
-if not %errorlevel%==0 (pause)
+gcc -c apps\first.c -o EXPLORER.ELF -I "%cd%\include"
+if not %errorlevel%==0 (echo 任意键重新编译。&pause>nul&goto main)
 title %t% - Writing To Harddisk Image...
 cls
 	echo √ 编译代码

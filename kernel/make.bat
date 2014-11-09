@@ -4,10 +4,11 @@
 ::
 ::    ROSE编写 Rose<roselyu@163.com>
 set comct=0
+if not "%1"=="" (set comct=%1)
 if not exist tmp (md tmp)
 ::if not exist private (md private)
-set t=Make 0.3 (Classic Style)
-set n=v15
+set t=Make 0.31 for Windows
+set n=Classic Style
 goto main
 :done
 title %t% - 完成
@@ -40,7 +41,7 @@ set command=
 set debug=
 title %t% - %n%
 echo 您当前是第%comct%次编译
-    	echo 我们的网站 www.GhostBirdOS.org
+    	echo Ghostbird's Offical Website: www.GhostBirdOS.org
 	echo.
 	echo Enter	构建并启动虚拟机(调试)
 	echo 1	构建并启动虚拟机(无调试)
@@ -54,7 +55,6 @@ echo 您当前是第%comct%次编译
 	echo.
 	echo 0	退出
 	echo.
-echo ** 由于Public Compiler Shell的推出，使用调试模式的时候编译次数会被重置。
 set /p command="功能:"
 if "%command%"=="" goto all
 if "%command%"=="1" goto debug
@@ -184,7 +184,7 @@ cls
 
 cls
 	echo %t% - %n%
-	echo 我们的网站 www.GhostBirdOS.org
+    	echo Ghostbird's Offical Website: www.GhostBirdOS.org
 	echo.
         if exist about (type about) else (echo Document not found.)
 goto done
@@ -192,7 +192,7 @@ goto done
 
 cls
 	echo %t% - %n%
-	echo 我们的网站www.GhostBirdOS.org
+    	echo Ghostbird's Offical Website: www.GhostBirdOS.org
 	echo.
 	if exist "updates.txt" (notepad "updates.txt"&goto done)
 goto done

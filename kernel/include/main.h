@@ -46,11 +46,10 @@ struct CMOS
       unsigned char reserved3[12];
 } cmos;
 void main(void);
-void test(void);
 void load_COPR(void);
 void load_BACKDROP_PIC(void);
 void put_info(void);
 void cmos_info(void);
 void second(void);
-void test(void);
+void load_ELF(void);
 #endif
