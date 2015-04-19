@@ -1,7 +1,0 @@
-
-Copyright (C) 2013-2014 by Explorer Developer.
-Copyright (C) 2013-2014 by Ghost Bird OS Developer.
-
-"Ghost Bird OS" is a operating system in developing,it uses "Explorer" as the kernel.
-
-You can visit www.GhostBirdOS.org if you want to join our group.
