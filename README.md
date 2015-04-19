@@ -1,4 +1,4 @@
-Explorer
+﻿Explorer
 ========
 
 Explorer, 最年轻的原创操作系统内核
@@ -7,7 +7,8 @@ Explorer, 最年轻的原创操作系统内核
 
 工程目录说明
 ============
-\kernel :内核源代码所在
-\Image :内核镜像文件
-\Docs :内核相关开发文档
-\tools :内核编译工具（暂未添加）
+kernel :内核源代码所在
+image :内核镜像文件
+docs :内核相关开发文档
+tools :内核编译工具（云盘）
+virtualbox :内核调试工具（云盘）
